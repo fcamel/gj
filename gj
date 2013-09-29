@@ -41,8 +41,12 @@ def main():
     gj_util.check_install()
 
     parser = optparse.OptionParser(usage=main.__doc__)
-    parser.add_option('-d', '--declaration', dest='declaration', action='store_true', default=False,
+    parser.add_option('-d', '--declaration', dest='declaration',
+                      action='store_true', default=False,
                       help='Find possible declarations.')
+    parser.add_option('-b', '--batch', dest='batch',
+                      action='store_true', default=False,
+                      help='Run in batch mode (i.e., no interaction).')
     options, args = parser.parse_args()
 
     if len(args) < 1:
@@ -62,6 +66,13 @@ def main():
     else:
         matches = gj_util.get_list()
 
+    # Run in batch mode?
+    if options.batch:
+        for m in matches:
+            print unicode(m).encode('utf8')
+        return 0
+
+    # Enter interactive mode.
     # Filter the rest or view the selected file.
     n = 0
     while True:
