@@ -168,7 +168,7 @@ def find_declaration_or_definition(pattern):
     result += _filter_pattern(matches, 'typedef')
     result += _filter_pattern(matches, 'define')
     # Find definition if possible.
-    result += _keep_definition(matches, pattern)
+    result += _keep_possible_definition(matches, pattern)
     return result
 
 #-----------------------------------------------------------
@@ -253,6 +253,17 @@ def _filter_filename(all_, pattern, exclude):
 def _subtract_list(kept, removed):
     return [e for e in kept if e not in removed]
 
-def _keep_definition(all_, pattern):
-    new_pattern = ':%s(' % pattern
-    return [m for m in all_ if new_pattern in m.text]
+def _keep_possible_definition(all_, pattern):
+    # "::METHOD(...)"
+    new_pattern = '::%s(' % pattern
+    result = [m for m in all_ if new_pattern in m.text]
+
+    # "METHOD() { ... }"  # '}' may be in the next line.
+    new_pattern = pattern + ' *\(.*{.*$'
+    result += [m for m in all_ if re.search(new_pattern, m.text)]
+
+    # "METHOD()"          # assume { ... } in the following lines.
+    new_pattern = pattern + '  *\([^;]*$'
+    result += [m for m in all_ if re.search(new_pattern, m.text)]
+
+    return result
