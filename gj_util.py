@@ -185,7 +185,20 @@ def _gid(pattern):
     process = subprocess.Popen(cmd,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
-    return process.stdout.read().decode('utf8').split('\n')
+    text = process.stdout.read()
+    try:
+        text = text.decode('utf8')
+    except Exception, e:
+        print 'cmd: <%s> returns non-utf8 result.' % cmd
+        result = []
+        for line in text.split('\n'):
+            try:
+                line = line.decode('utf8')
+                result.append(line)
+            except Exception, e:
+                print '%s: skip <%s>' % (e, line)
+        return result
+    return text.split('\n')
 
 def _show_list(matches, patterns, last_n, fold):
     def yellow(text):
