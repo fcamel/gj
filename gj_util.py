@@ -227,8 +227,9 @@ def _show_list(matches, patterns, last_n, fold):
         if i == last_n:
             print black('(%s) %s:%s:%s' % (i, m.line_num, m.filename, m.text))
         else:
+            code = m.text
             for pattern in patterns:
-                code = m.text.replace(pattern, yellow_background(pattern))
+                code = code.replace(pattern, yellow_background(pattern))
             print '(%s) %s:%s:%s' % (red(i), yellow(m.line_num), green(m.filename), code)
 
 def _filter_statement(all_, exclude):
