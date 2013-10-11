@@ -43,6 +43,12 @@ class Match(object):
     def __str__(self):
         return str(unicode(self))
 
+    def __cmp__(self, other):
+        r = cmp(self.filename, other.filename)
+        if r:
+            return r
+        return cmp(self.line_num, other.line_num)
+
 def check_install():
     for cmd in ['mkid', _get_gid_cmd()]:
         ret = os.system('which %s > /dev/null' % cmd)
@@ -160,16 +166,16 @@ def find_declaration_or_definition(pattern):
 
     matches = tuple(get_list([pattern]))
     # Find declaration if possible.
-    result = []
+    result = set()
     for type_ in ('class', 'struct', 'enum'):
         tmp = _filter_pattern(matches, type_)
         tmp = _filter_statement(tmp, True)
-        result += tmp
-    result += _filter_pattern(matches, 'typedef')
-    result += _filter_pattern(matches, 'define')
+        result.update(tmp)
+    result.update(_filter_pattern(matches, 'typedef'))
+    result.update(_filter_pattern(matches, 'define'))
     # Find definition if possible.
-    result += _keep_possible_definition(matches, pattern)
-    return result
+    result.update(_keep_possible_definition(matches, pattern))
+    return sorted(result)
 
 #-----------------------------------------------------------
 # private
@@ -268,16 +274,14 @@ def _subtract_list(kept, removed):
     return [e for e in kept if e not in removed]
 
 def _keep_possible_definition(all_, pattern):
+    result = set()
+
     # "::METHOD(...)"
     new_pattern = '::%s(' % pattern
-    result = [m for m in all_ if new_pattern in m.text]
+    result.update(m for m in all_ if new_pattern in m.text)
 
-    # "METHOD() { ... }"  # '}' may be in the next line.
-    new_pattern = pattern + ' *\(.*{.*$'
-    result += [m for m in all_ if re.search(new_pattern, m.text)]
-
-    # "METHOD()"          # assume { ... } in the following lines.
-    new_pattern = pattern + '  *\([^;]*$'
-    result += [m for m in all_ if re.search(new_pattern, m.text)]
+    # "METHOD() { ... }"
+    new_pattern = pattern + ' *\(.*{.*}.*$'
+    result.update(m for m in all_ if re.search(new_pattern, m.text))
 
     return result
