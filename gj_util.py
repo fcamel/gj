@@ -97,6 +97,7 @@ def filter_until_select(matches, patterns, last_n):
             print 'No file matched.'
             return 0, matches, patterns
 
+        matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
         msg = (
             '\nSelect an action:'
@@ -224,7 +225,7 @@ def _show_list(matches, patterns, last_n, fold):
 
     os.system('clear')
     last_filename = ''
-    for i, m in enumerate(sorted(set(matches))):
+    for i, m in enumerate(matches):
         if fold and m.filename == last_filename:
             continue
 
