@@ -224,7 +224,7 @@ def _show_list(matches, patterns, last_n, fold):
 
     os.system('clear')
     last_filename = ''
-    for i, m in enumerate(matches):
+    for i, m in enumerate(sorted(set(matches))):
         if fold and m.filename == last_filename:
             continue
 
