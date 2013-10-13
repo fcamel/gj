@@ -158,7 +158,11 @@ def filter_until_select(matches, patterns, last_n):
 
     return n, matches, patterns
 
-def find_declaration_or_definition(pattern):
+def find_declaration_or_definition(pattern, level):
+    if level <= 0:
+        return []
+
+    # Level 1 Rules:
     if pattern.startswith('m_') or pattern.startswith('s_'):
         # For non-static member fields or static member fields,
         # find symobls in header files.
@@ -176,6 +180,15 @@ def find_declaration_or_definition(pattern):
     result.update(_filter_pattern(matches, 'define'))
     # Find definition if possible.
     result.update(_keep_possible_definition(matches, pattern))
+
+    # Level 2 Rules:
+    if level > 1:
+        # Treat pattern as file name to filter results.
+        old_result = result
+        result = set()
+        for filename in _find_possible_filename(pattern):
+            print filename
+            result.update(_filter_filename(old_result, filename, False))
     return sorted(result)
 
 #-----------------------------------------------------------
@@ -286,3 +299,22 @@ def _keep_possible_definition(all_, pattern):
     result.update(m for m in all_ if re.search(new_pattern, m.text))
 
     return result
+
+def _find_possible_filename(pattern):
+    def to_camelcase(word):
+        '''
+        Ref. http://stackoverflow.com/questions/4303492/how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
+        '''
+        return ''.join(x.capitalize() or '_' for x in word.split('_'))
+
+    def to_underscore(name):
+        '''
+        Ref. http://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case/1176023#1176023
+        '''
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+    if re.search('[A-Z]', pattern):  # assume it's a camcelcase pattern
+        return (to_underscore(pattern), pattern)
+    else:  # assume it's an underscore pattern
+        return (pattern, to_camcelcase(pattern))

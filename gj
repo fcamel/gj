@@ -41,9 +41,9 @@ def main():
     gj_util.check_install()
 
     parser = optparse.OptionParser(usage=main.__doc__)
-    parser.add_option('-d', '--declaration', dest='declaration',
-                      action='store_true', default=False,
-                      help='Find possible declarations.')
+    parser.add_option('-d', '--declaration', dest='declaration', type=int, default=0,
+                      help=('Find possible declarations or definitions. '
+                            'Higher level finds less result (default=0).'))
     parser.add_option('-b', '--batch', dest='batch',
                       action='store_true', default=False,
                       help='Run in batch mode (i.e., no interaction).')
@@ -61,8 +61,9 @@ def main():
 
     # Find the initial matched set.
     gj_util.get_list.original_patterns = patterns
-    if options.declaration:
-        matches = gj_util.find_declaration_or_definition(patterns[0])
+    if options.declaration > 0:
+        matches = gj_util.find_declaration_or_definition(patterns[0],
+                                                         options.declaration)
     else:
         matches = gj_util.get_list()
 
