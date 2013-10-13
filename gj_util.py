@@ -187,7 +187,6 @@ def find_declaration_or_definition(pattern, level):
         old_result = result
         result = set()
         for filename in _find_possible_filename(pattern):
-            print filename
             result.update(_filter_filename(old_result, filename, False))
     return sorted(result)
 
