@@ -12,7 +12,7 @@ if (exists('g:loaded_gj_vim') && g:loaded_gj_vim)
 endif
 let g:loaded_gj_vim = 1
 
-let g:ackprg = expand("%:p") . "../../bin/gj_without_interaction"
+let g:ackprg = expand("<sfile>:p:h") . "/../bin/gj_without_interaction"
 
 " Find all occurence of the symbol under the cursor.
 nnoremap <silent> <Leader>g :Ack<CR>
