@@ -15,9 +15,9 @@ let g:loaded_gj_vim = 1
 let g:ackprg = expand("<sfile>:p:h") . "/../bin/gj_without_interaction"
 
 " Find all occurence of the symbol under the cursor.
-nnoremap <silent> <Leader>g :Ack<CR>
+nnoremap <silent> <Leader>g :Ack!<CR>
 " Find all possible declarations or definitions.
-nnoremap <silent> <Leader>G :Ack -d1 <C-R>=expand("<cword>")<CR> <CR>
+nnoremap <silent> <Leader>G :Ack! -d1 <C-R>=expand("<cword>")<CR> <CR>
 " Find all possible declarations or definitions with a more strongly guess
 " (much less results)
-nnoremap <silent> <Leader>d :Ack -d2 <C-R>=expand("<cword>")<CR> <CR>
+nnoremap <silent> <Leader>d :Ack! -d2 <C-R>=expand("<cword>")<CR> <CR>
