@@ -25,11 +25,12 @@ The goals of [gj] from high to low are:
 
 1. `gj -i`: build the index.
 2. `gj main argc argv`: find out the main functions. C/C++ main() typically has these three keywords.
-3. `example`: keep files with the substring *example*.
-4. `!test`: remove files with the substring *test*.
+3. `example`: keep files with the substring *example* in the file name.
+4. `!test`: remove files with the substring *test* in the file name.
 5. `1`: Use Vim to edit the first file and jump to the corresponding line.
-6. `2`: Edit the second one.
-7. In Vim, `<leader>G` under *DoLogin*: list possible definitions or declarations of *DoLogin*.
+6. Exit Vim and back to [gj].
+7. `2`: Edit the second one.
+8. In Vim, `<leader>G` under *DoLogin*: list possible definitions or declarations of *DoLogin*.
 
 ## Installation ##
 
@@ -41,7 +42,7 @@ Install [ID Utils] on Debian / Ubuntu with:
 
     sudo apt-get install id-utils
 
-### Vim Plugin + Command Line tool ###
+### Vim Plugin + Command Line Tool ###
 
 #### Vundle ####
 
@@ -64,7 +65,7 @@ In order to use the command line tool, add this to your `$HOME/.bashrc` (or othe
 export PATH="$PATH:$HOME/.vim/bundle/gj/bin"
 ```
 
-### (optional) Command Line Tool only ###
+### (optional) Command Line Tool Only ###
 
 ```baseh
 $ cd /path/to/somewhere/
