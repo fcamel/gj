@@ -1,3 +1,4 @@
 #!/bin/bash
+# Helper script for gj.vim
 
 `dirname $0`/gj -b $@

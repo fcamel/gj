@@ -2,8 +2,7 @@
 # -*- encoding: utf8 -*-
 
 '''
-Change _gen_command if you don't use vim.
-Change input mappings if you are not used to the default inputs.
+gj: an interactive tool to find out symbols.
 '''
 
 import sys
@@ -20,9 +19,20 @@ __author__ = 'fcamel'
 # Configuration
 #------------------------------------------------------------------------------
 def _gen_vim_command(filename, line, pattern):
-    return 'vi %s -c/%s +%s' % (filename, pattern, line)
+    return 'vim %s -c/%s +%s' % (filename, pattern, line)
 
-_gen_command = _gen_vim_command
+# Use vim by default.
+_gen_edit_command = _gen_vim_command
+
+if 'EDITOR'in os.environ:
+    editor = os.environ['EDITOR']
+    # Add your _gen_edit_command if you don't use vim.
+    # E.g., emacs
+
+    # For a general editor, don't know how to jump to the line and highglight
+    # the pattern. Only open the file.
+    if editor != 'vi' and editor != 'vim':
+        _gen_edit_command = lambda filename, p, l: '%s %s' % (editor, filename)
 
 #------------------------------------------------------------------------------
 # main
@@ -94,7 +104,7 @@ def main():
         # Edit the chosen one.
         m = matches[n - 1]
 
-        ret = os.system(_gen_command(m.filename, m.line_num, patterns[0]))
+        ret = os.system(_gen_edit_command(m.filename, m.line_num, patterns[0]))
         if ret != 0:
             return 4
 
