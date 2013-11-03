@@ -87,12 +87,12 @@ Then follow the instructions of output.
 
 ### Vim Plugin ###
 
-In Vim:
-```
-<leader>g: Find all matched files of the word under the cursor.
-<leader>G: Find all possible declarations or definitions of the word under the cursor.
-<leader>d: Find all possible declarations or definitions with a more strongly guess (much less results) of the word under the cursor..
-```
+In normal mode:
+
+* `<leader>g` Find all matched files of the word under the cursor.
+* `<leader>G` Find all possible declarations or definitions of the word under the cursor.
+* `<leader>d`: Find all possible declarations or definitions with a more strongly guess (much less results) of the word under the cursor.
+
 
 [gj]:https://github.com/fcamel/gj
 [gj.vim]:https://github.com/fcamel/gj/blob/master/plugin/gj.vim
