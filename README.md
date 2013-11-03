@@ -17,7 +17,19 @@ The goals of [gj] from high to low are:
 [gj] is used in two ways:
 
 * Run as an interactive command line tool to edit and filter candidate files interactively.
-* As a plugin in vim to find files which containt the symbol under the cursor.
+* As a plugin in Vim to find files which containt the symbol under the cursor.
+
+## Demo ##
+
+![Example usage of gj](https://raw.github.com/fcamel/screenshots/master/gj/gj_demo.gif)
+
+1. `gj -i`: build the index.
+2. `gj main argc argv`: find out the main functions. C/C++ main() typically has these three keywords.
+3. `example`: keep files with the substring *example*.
+4. `!test`: remove files with the substring *test*.
+5. `1`: Use Vim to edit the first file and jump to the corresponding line.
+6. `2`: Edit the second one.
+7. In Vim, `<leader>G` under *DoLogin*: list possible definitions or declarations of *DoLogin*.
 
 ## Installation ##
 
@@ -65,17 +77,16 @@ $ export PATH="$PATH:~/bin"
 
 ### Command Line Tool ###
 
-TODO
 
 ```bash
 $ cd /path/to/project/
-$ mkid
+$ gj -i
 $ gj SYMBOL
 ```
 
-### Vim Plugin ###
+Then follow the instructions of output.
 
-TODO
+### Vim Plugin ###
 
 In Vim:
 ```
@@ -89,3 +100,9 @@ In Vim:
 [ID Utils]:http://www.gnu.org/software/idutils/
 [Vundle]:http://github.com/gmarik/vundle
 [ack.vim]:https://github.com/mileszs/ack.vim
+
+## Todo ##
+
+* Let `-d` work for Python. Currently it only works for C++.
+* Improve speed.
+* Support Emacs as well.
