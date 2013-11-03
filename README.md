@@ -103,6 +103,6 @@ In Vim:
 
 ## Todo ##
 
-* Let `-d` work for Python. Currently it only works for C++.
-* Improve speed.
+* Improve `-d`'s speed.
+* Improve `-d`'s accuracy.
 * Support Emacs as well.
