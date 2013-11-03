@@ -14,6 +14,8 @@ __author__ = 'fcamel'
 # Configuration
 #------------------------------------------------------------------------------
 
+LANG_MAP_FILE     = "id-lang.map"
+
 # Input mappings
 A_KEEP_STATEMENT  = ';'
 A_CLEAN_STATEMENT = '!;'
@@ -63,6 +65,10 @@ def check_install():
                 msg += "sudo apt-get install id-utils"
             print msg
             sys.exit(1)
+
+def build_index():
+    path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
+    return _mkid(path)
 
 def get_list(patterns=None):
     if patterns is None:
@@ -193,6 +199,15 @@ def find_declaration_or_definition(pattern, level):
 #-----------------------------------------------------------
 # private
 #-----------------------------------------------------------
+def _mkid(lang_file):
+    cmd = ['mkid', '-m', lang_file]
+    process = subprocess.Popen(cmd,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    print process.stdout.read()
+    print process.stderr.read()
+    return True
+
 def _get_gid_cmd():
     gid = 'gid'
     if platform.system() == 'Darwin':

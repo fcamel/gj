@@ -41,21 +41,29 @@ def main():
     gj_util.check_install()
 
     parser = optparse.OptionParser(usage=main.__doc__)
-    parser.add_option('-d', '--declaration', dest='declaration', type=int, default=0,
+    parser.add_option('-d', '--declaration', dest='declaration',
+                      type=int, default=0,
                       help=('Find possible declarations or definitions. '
                             'Higher level finds less result (default=0).'))
     parser.add_option('-b', '--batch', dest='batch',
                       action='store_true', default=False,
                       help='Run in batch mode (i.e., no interaction).')
+    parser.add_option('-i', '--index', dest='index',
+                      action='store_true', default=False,
+                      help='Build index.')
     options, args = parser.parse_args()
+
+    if options.index:
+        result = gj_util.build_index()
+        return 0 if result else 1
 
     if len(args) < 1:
         parser.print_help()
-        sys.exit(1)
+        return 2
 
     if not os.path.exists('ID'):
-        print 'Database file "ID" is not found. Have you run "mkid"?'
-        return 2
+        print 'Database file "ID" is not found. Have you run "gj -i"?'
+        return 3
 
     patterns = args
 
@@ -88,7 +96,7 @@ def main():
 
         ret = os.system(_gen_command(m.filename, m.line_num, patterns[0]))
         if ret != 0:
-            return 2
+            return 4
 
     return 0
 

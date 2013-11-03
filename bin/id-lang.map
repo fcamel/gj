@@ -1,0 +1,50 @@
+# Default language
+**               IGNORE
+
+# HTML
+*.htm            IGNORE
+*.html           IGNORE
+
+# list header files before code files
+*.h              text
+*.h.in           text
+*.H              text 
+*.hh             text
+*.hpp            text
+*.hxx            text
+
+# list C code files after header files
+*.c              text    
+*.C              text
+*.cc             text
+*.cpp            text
+*.cxx            text
+
+# list assembly language after C
+*.[sS]           text
+*.asm            text
+
+# Objective-C
+*.m              text
+*.mm             text
+
+# Other languages
+*.py             text
+*.java           text
+*.js             text
+*.php            text
+
+# Build files
+*.mk             text
+*.scons          text
+*.gyp            text
+*.gypi           text
+*.ninja          text
+                
+# Other       
+*.tpl            text
+*.xml            text
+*.jsm            text
+*.idl            text
+*.ipdl           text
+*.in             text
