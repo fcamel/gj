@@ -67,10 +67,9 @@ export PATH="$PATH:$HOME/.vim/bundle/gj/bin"
 ### (optional) Command Line Tool only ###
 
 ```baseh
+$ cd /path/to/somewhere/
 $ git clone https://github.com/fcamel/gj
-$ mkdir -p $HOME/bin/
-$ cp -p bin/* $HOME/bin/
-$ export PATH="$PATH:$HOME/bin"
+$ export PATH="$PATH:`pwd`/bin"
 ```
 
 ## Usage ##
@@ -106,3 +105,4 @@ In Vim:
 * Improve `-d`'s accuracy.
 * Support Emacs as well.
 * Add the Vim document.
+* Add more screenshots.
