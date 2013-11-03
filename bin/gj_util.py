@@ -304,12 +304,16 @@ def _subtract_list(kept, removed):
 def _keep_possible_definition(all_, pattern):
     result = set()
 
-    # "::METHOD(...)"
+    # C++: "::METHOD(...)"
     new_pattern = '::%s(' % pattern
     result.update(m for m in all_ if new_pattern in m.text)
 
-    # "METHOD() { ... }"
+    # C++: "METHOD() { ... }"
     new_pattern = pattern + ' *\(.*{.*}.*$'
+    result.update(m for m in all_ if re.search(new_pattern, m.text))
+
+    # Python: "def METHOD"
+    new_pattern = 'def +' + pattern
     result.update(m for m in all_ if re.search(new_pattern, m.text))
 
     return result
