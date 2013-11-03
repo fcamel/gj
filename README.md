@@ -67,7 +67,7 @@ export PATH="$PATH:$HOME/.vim/bundle/gj/bin"
 
 ### (optional) Command Line Tool Only ###
 
-```baseh
+```bash
 $ cd /path/to/somewhere/
 $ git clone https://github.com/fcamel/gj
 $ export PATH="$PATH:`pwd`/bin"
@@ -87,7 +87,7 @@ Then follow the instructions of output.
 
 ### Vim Plugin ###
 
-In normal mode:
+In Normal mode:
 
 * `<leader>g` Find all matched files of the word under the cursor.
 * `<leader>G` Find all possible declarations or definitions of the word under the cursor.
