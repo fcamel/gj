@@ -58,30 +58,29 @@ Bundle 'fcamel/gj'
 
 Then launch `vim` and run `:BundleInstall`.
 
-In order to use the command line tool, add this to your `~/.bashrc` (or other shell config file):
+In order to use the command line tool, add this to your `$HOME/.bashrc` (or other shell config file):
 
 ```bash
-export PATH="$PATH:~/.vim/bundle/gj/bin"
+export PATH="$PATH:$HOME/.vim/bundle/gj/bin"
 ```
 
 ### (optional) Command Line Tool only ###
 
 ```baseh
 $ git clone https://github.com/fcamel/gj
-$ mkdir ~/bin/
-$ cp -p bin/* ~/bin/
-$ export PATH="$PATH:~/bin"
+$ mkdir -p $HOME/bin/
+$ cp -p bin/* $HOME/bin/
+$ export PATH="$PATH:$HOME/bin"
 ```
 
 ## Usage ##
 
 ### Command Line Tool ###
 
-
 ```bash
 $ cd /path/to/project/
-$ gj -i
-$ gj SYMBOL
+$ gj -i                 # Build the index.
+$ gj SYMBOL             # Find out SYMBOL
 ```
 
 Then follow the instructions of output.
@@ -106,3 +105,4 @@ In Vim:
 * Improve `-d`'s speed.
 * Improve `-d`'s accuracy.
 * Support Emacs as well.
+* Add the Vim document.
