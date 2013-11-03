@@ -17,7 +17,7 @@ The goals of [gj] from high to low are:
 [gj] is used in two ways:
 
 * Run as an interactive command line tool to edit and filter candidate files interactively.
-* As a plugin in Vim to find files which containt the symbol under the cursor.
+* As a plugin in Vim to find files which containt the word under the cursor.
 
 ## Demo ##
 
@@ -36,7 +36,7 @@ The goals of [gj] from high to low are:
 
 ### Prerequisite ###
 
-[gj] is based on [ID Utils] which finds symbols instantly.
+[gj] is based on [ID Utils] which finds patterns instantly.
 
 Install [ID Utils] on Debian / Ubuntu with:
 
@@ -80,7 +80,7 @@ $ export PATH="$PATH:`pwd`/bin"
 ```bash
 $ cd /path/to/project/
 $ gj -i                 # Build the index.
-$ gj SYMBOL             # Find out SYMBOL
+$ gj PATTERN            # Find out PATTERN
 ```
 
 Then follow the instructions of output.
@@ -89,9 +89,9 @@ Then follow the instructions of output.
 
 In Vim:
 ```
-<leader>g: Find all matched files of the symbol under the cursor.
-<leader>G: Find all possible declarations or definitions of the symbol under the cursor.
-<leader>d: Find all possible declarations or definitions with a more strongly guess (much less results) of the symbol under the cursor..
+<leader>g: Find all matched files of the word under the cursor.
+<leader>G: Find all possible declarations or definitions of the word under the cursor.
+<leader>d: Find all possible declarations or definitions with a more strongly guess (much less results) of the word under the cursor..
 ```
 
 [gj]:https://github.com/fcamel/gj
