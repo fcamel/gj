@@ -53,16 +53,17 @@ class Match(object):
 
 def check_install():
     for cmd in ['mkid', _get_gid_cmd()]:
-        ret = os.system('which %s > /dev/null' % cmd)
-        if ret != 0:
+        if not _is_cmd_exists(cmd):
             msg = (
                 "The program '%s' is currently not installed.  "
                 "You can install it by typing:\n" % cmd
             )
-            if platform.system() == 'Darwin':
-                msg += "sudo port install idutils"
+            install_cmd = _get_idutils_install_cmd()
+            if install_cmd:
+                msg += install_cmd
             else:
-                msg += "sudo apt-get install id-utils"
+                msg += "  (Unknown package manager. Try to install id-utils anyway.)\n"
+                msg += "  (http://www.gnu.org/software/idutils/)"
             print msg
             sys.exit(1)
 
@@ -208,10 +209,27 @@ def _mkid(lang_file):
     print process.stderr.read()
     return True
 
+def _is_cmd_exists(cmd):
+    return 0 == subprocess.call(['which', cmd])
+
+def _get_idutils_install_cmd():
+    if platform.system() == 'Darwin':
+        mgrs = {
+               'port': "sudo port install idutils", # MacPorts
+               'brew': "brew install idutils",      # Homebrew
+            }
+        for mgr, cmd in mgrs.items():
+            if _is_cmd_exists(mgr):
+                return cmd
+        return ""
+    else:
+        return "sudo apt-get install id-utils"
+
 def _get_gid_cmd():
     gid = 'gid'
     if platform.system() == 'Darwin':
-        gid = 'gid32'
+        if not _is_cmd_exists(gid):
+            gid = 'gid32'
     return gid
 
 def _gid(pattern):
