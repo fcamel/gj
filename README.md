@@ -36,11 +36,13 @@ The goals of [gj] from high to low are:
 
 ### Prerequisite ###
 
-[gj] is based on [ID Utils] which finds patterns instantly.
+[gj] is based on [ID Utils] which finds patterns instantly. Install [ID Utils] by:
 
-Install [ID Utils] on Debian / Ubuntu with:
-
-    sudo apt-get install id-utils
+```bash
+$ sudo apt-get install id-utils  # Debian / Ubuntu
+$ sudo port install idutils      # OS X with MacPorts
+$ brew install idutils           # OS X with Homebrew
+```
 
 ### Vim Plugin + Command Line Tool ###
 
