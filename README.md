@@ -17,7 +17,7 @@ The goals of [gj] from high to low are:
 [gj] is used in two ways:
 
 * Run as an interactive command line tool to edit and filter candidate files interactively.
-* As a plugin in Vim to find files which containt the word under the cursor.
+* As a plugin in [Vim] to find files which containt the word under the cursor.
 
 ## Demo ##
 
@@ -27,10 +27,11 @@ The goals of [gj] from high to low are:
 2. `gj main argc argv`: find out the main functions. C/C++ main() typically has these three keywords.
 3. `example`: keep files with the substring *example* in the file name.
 4. `!test`: remove files with the substring *test* in the file name.
-5. `1`: Use Vim to edit the first file and jump to the corresponding line.
-6. Exit Vim and back to [gj].
+5. `1`: Use [Vim] to edit the first file and jump to the corresponding line.
+6. Exit [Vim] and back to [gj].
 7. `2`: Edit the second one.
-8. In Vim, `<leader>G` under *DoLogin*: list possible definitions or declarations of *DoLogin*.
+8. In [Vim], `<leader>G` under *DoLogin*: list possible definitions or declarations of *DoLogin*.
+9. In [Vim], `<leader>g` under *DoLogin*: list all callers, definitions or declarations of *DoLogin*.
 
 ## Installation ##
 
@@ -48,7 +49,7 @@ $ brew install idutils           # OS X with Homebrew
 
 #### Vundle ####
 
-Install [gj.vim] via [Vundle]. Please refer documents in [Vundle]: a highly recommended tool to manage vim plugins.
+Install [gj.vim] via [Vundle]. Please refer documents in [Vundle]: a highly recommended tool to manage [Vim] plugins.
 
 #### Vim plugins ####
 
@@ -85,7 +86,12 @@ $ gj -i                 # Build the index.
 $ gj PATTERN            # Find out PATTERN
 ```
 
-Then follow the instructions of output.
+Then follow the instructions in terminal. 
+
+If you don't use [Vim] as your main editor, please set the environment variable `EDITOR` to your favorite editor.
+However, currently only [Vim] supports "jump to the line" and "highlight the searched pattern" when opening
+the file.
+
 
 ### Vim Plugin ###
 
@@ -98,6 +104,7 @@ In Normal mode:
 
 [gj]:https://github.com/fcamel/gj
 [gj.vim]:https://github.com/fcamel/gj/blob/master/plugin/gj.vim
+[Vim]:http://www.vim.org/
 [ID Utils]:http://www.gnu.org/software/idutils/
 [Vundle]:http://github.com/gmarik/vundle
 [ack.vim]:https://github.com/mileszs/ack.vim
@@ -107,5 +114,5 @@ In Normal mode:
 * Improve `-d`'s speed.
 * Improve `-d`'s accuracy.
 * Support Emacs as well.
-* Add the Vim document.
+* Add the [Vim] document.
 * Add more screenshots.
