@@ -210,7 +210,9 @@ def _mkid(lang_file):
     return True
 
 def _is_cmd_exists(cmd):
-    return 0 == subprocess.call(['which', cmd])
+    return 0 == subprocess.call(['which', cmd],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
 
 def _get_idutils_install_cmd():
     if platform.system() == 'Darwin':
