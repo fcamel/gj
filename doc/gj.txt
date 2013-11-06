@@ -1,0 +1,51 @@
+*gj.txt*   Plugin that integrates gj with Vim
+
+==============================================================================
+Author:  Chia-Hao Lo <fcamel+gj@gmail.com>         *gj-author*
+License: Same terms as Vim itself (see |license|)
+
+==============================================================================
+INTRODUCTION                                                             *gj*
+
+See https://github.com/fcamel/gj
+
+==============================================================================
+MAPPINGS                                                        *gj-mappings*
+
+The following commands are available in |Normal-mode|:
+
+<Leader>g               Find all matched files of the word under the cursor.
+                        
+<Leader>G               Find all possible declarations or definitions of the
+                        word under the cursor.
+                        
+<Leader>d               Find all possible declarations or definitions with a
+                        more strongly guess (much less results) of the word
+                        under the cursor.
+
+
+Then the matched files are list in the quickfix window. You can use the
+following keyboard shortcuts in the quickfix window:
+
+o                       open file (same as enter).
+                       
+go                      open file (but maintain focus in quickfix window).
+                       
+t                       open in a new tab.
+                       
+T                       open in new tab silently.
+                       
+h                       open in horizontal split.
+                       
+H                       open in horizontal split silently.
+                       
+v                       open in vertical split.
+                       
+gv                      open in vertical split silently.
+                       
+q                       close the quickfix window.
+
+
+If you want to more filtering in quickfix window, you can use
+":set modifiable" in quickfix window and then filter it using
+Vim commands. For example, ":% g/PATTERN/d".
