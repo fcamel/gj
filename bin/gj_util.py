@@ -83,7 +83,7 @@ def get_list(patterns=None):
     for pattern in patterns[1:]:
         matches = _filter_pattern(matches, pattern)
 
-    return matches
+    return sorted(matches)
 
 get_list.original_patterns = []
 
@@ -152,6 +152,8 @@ def filter_until_select(matches, patterns, last_n):
             exclude = False
         matches = _filter_filename(matches, response, exclude)
 
+    matches.sort()
+
     # Parse the selected number
     try:
         n = int(response)
@@ -195,6 +197,7 @@ def find_declaration_or_definition(pattern, level):
         result = set()
         for filename in _find_possible_filename(pattern):
             result.update(_filter_filename(old_result, filename, False))
+
     return sorted(result)
 
 #-----------------------------------------------------------
