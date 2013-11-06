@@ -106,21 +106,7 @@ def filter_until_select(matches, patterns, last_n):
 
         matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
-        msg = (
-            '\nSelect an action:'
-            '\n* Input number to select a file.'
-            '\n* Type "%s" / "%s" to keep / remove statements.'
-            '\n* Type "%s" to switch between all matches and fold matches.'
-            '\n* Type STRING (regex) to filter filename. !STRING means exclude '
-            'the matched filename: '
-            '\n* Type %s[PATTERN1 PATTERN2 ~PATTERN3 ...] to start over. '
-            '\n  Type only "%s" to use the patterns from the command line.'
-            '\n* Type ENTER to exit.'
-            '\n'
-            '\n>> ' % (A_KEEP_STATEMENT, A_CLEAN_STATEMENT,
-                       A_FOLD, A_RESTART, A_RESTART)
-        )
-        response = raw_input(msg).strip()
+        response = raw_input(_get_prompt_help()).strip()
         if not response:
             return 0, matches, patterns
 
@@ -359,3 +345,21 @@ def _find_possible_filename(pattern):
         return (to_underscore(pattern), pattern)
     else:  # assume it's an underscore pattern
         return (pattern, to_camcelcase(pattern))
+
+# TODO(fcamel): modulize filter actions and combine help message and filter actions together.
+def _get_prompt_help():
+    msg = (
+        '\nSelect an action:'
+        '\n* Input number to select a file.'
+        '\n* Type "%s" / "%s" to keep / remove statements.'
+        '\n* Type "%s" to switch between all matches and fold matches.'
+        '\n* Type STRING (regex) to filter filename. !STRING means exclude '
+        'the matched filename: '
+        '\n* Type %s[PATTERN1 PATTERN2 ~PATTERN3 ...] to start over. '
+        '\n  Type only "%s" to use the patterns from the command line.'
+        '\n* Type ENTER to exit.'
+        '\n'
+        '\n>> ' % (A_KEEP_STATEMENT, A_CLEAN_STATEMENT,
+                   A_FOLD, A_RESTART, A_RESTART)
+    )
+    return msg
