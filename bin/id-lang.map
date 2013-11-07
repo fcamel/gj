@@ -33,6 +33,7 @@
 *.java           text
 *.js             text
 *.php            text
+*.sh             text
 
 # Build files
 *.mk             text
