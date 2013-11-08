@@ -97,9 +97,21 @@ the file.
 
 In Normal mode:
 
-* `<leader>g` Find all matched files of the word under the cursor.
-* `<leader>G` Find all possible declarations or definitions of the word under the cursor.
+* `<leader>g`: Find all matched files of the word under the cursor.
+* `<leader>G`: Find all possible declarations or definitions of the word under the cursor.
 * `<leader>d`: Find all possible declarations or definitions with a more strongly guess (much less results) of the word under the cursor.
+
+Then use the following commands in quickfix window:
+
+* `o` : open file (same as enter).
+* `go`: open file (but maintain focus in quickfix window). 
+* `t` : open in a new tab.
+* `T` : open in new tab silently.
+* `h` : open in horizontal split.
+* `H` : open in horizontal split silently.
+* `v` : open in vertical split.
+* `gv`: open in vertical split silently.
+* `q` : close the quickfix window.
 
 
 [gj]:https://github.com/fcamel/gj
@@ -114,5 +126,4 @@ In Normal mode:
 * Improve `-d`'s speed.
 * Improve `-d`'s accuracy.
 * Support Emacs as well.
-* Add the [Vim] document.
 * Add more screenshots.
