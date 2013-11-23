@@ -61,6 +61,9 @@ def main():
     parser.add_option('-i', '--index', dest='index',
                       action='store_true', default=False,
                       help='Build index.')
+    parser.add_option('-s', '--symbol', dest='symbol',
+                      action='store_true', default=False,
+                      help='Find symbols given sub-string (case-insensitive match).')
     options, args = parser.parse_args()
 
     if options.index:
@@ -76,6 +79,13 @@ def main():
         return 3
 
     patterns = args
+
+    # Find matched symbols
+    if options.symbol:
+        lines = gj_util.find_symbols(patterns[0])
+        for line in lines:
+            print line.encode('utf8')
+        return 0
 
     # Find the initial matched set.
     gj_util.get_list.original_patterns = patterns
