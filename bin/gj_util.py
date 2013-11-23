@@ -281,12 +281,6 @@ def _filter_statement(all_, exclude):
         return matches
     return _subtract_list(all_, matches)
 
-def _filter_filename(all_, pattern, exclude):
-    matched = [m for m in all_ if re.search(pattern, m.filename)]
-    if not exclude:
-        return matched
-    return _subtract_list(all_, matched)
-
 def _filter_pattern(matches, pattern):
     negative_symbol = '~'
 
