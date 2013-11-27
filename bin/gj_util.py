@@ -186,9 +186,45 @@ def find_declaration_or_definition(pattern, level):
 
     return sorted(result)
 
-def find_symbols(pattern):
-    lines = _lid(pattern, ['-lis', '-R', 'none'])
-    return [_highlight(pattern, line) for line in lines if line]
+def find_symbols(pattern, verbose=False):
+    args = ['-lis']
+    if not verbose:
+        args.extend(('-R', 'none'))
+    lines = _lid(pattern, args)
+    result = []
+    max_width = 120
+    indent = 8
+    for line in lines:
+        if len(line) < max_width:
+            result.append(line)
+            continue
+
+        tokens = line.split()
+        first_line = True
+        first_token = True
+        current_length = 0
+        ts = []
+        for tk in tokens:
+            length = len(tk)
+            if not first_token:
+                length += 1
+            if current_length + length > max_width:
+                prefix = '' if first_line else ' ' * indent
+                result.append(prefix + ' '.join(ts))
+                ts = []
+                first_line = False
+                first_token = True
+                current_length = indent;
+                length = len(tk)
+
+            ts.append(tk)
+            current_length += length
+
+        if not ts:
+            prefix = '' if first_line else ' ' * indent
+            result.append(prefix + ' '.join(ts))
+
+    return [_highlight(pattern, line) for line in result if line]
 
 #-----------------------------------------------------------
 # private

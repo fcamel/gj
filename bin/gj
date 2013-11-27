@@ -63,7 +63,11 @@ def main():
                       help='Build index.')
     parser.add_option('-s', '--symbol', dest='symbol',
                       action='store_true', default=False,
-                      help='Find symbols given sub-string (case-insensitive match).')
+                      help=('Find symbols given sub-string (case-insensitive match).'
+                            ' Display filenames when -v is applied.'))
+    parser.add_option('-v', '--verbose', dest='verbose',
+                      action='store_true', default=False,
+                      help='Display more information (default: False).')
     options, args = parser.parse_args()
 
     if options.index:
@@ -82,7 +86,7 @@ def main():
 
     # Find matched symbols
     if options.symbol:
-        lines = gj_util.find_symbols(patterns[0])
+        lines = gj_util.find_symbols(patterns[0], verbose=options.verbose)
         for line in lines:
             print line.encode('utf8')
         return 0
