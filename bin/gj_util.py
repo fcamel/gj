@@ -186,6 +186,10 @@ def find_declaration_or_definition(pattern, level):
 
     return sorted(result)
 
+def find_symbols(pattern):
+    lines = _lid(pattern, ['-lis', '-R', 'none'])
+    return [_highlight(pattern, line) for line in lines if line]
+
 #-----------------------------------------------------------
 # private
 #-----------------------------------------------------------
@@ -223,9 +227,8 @@ def _get_gid_cmd():
             gid = 'gid32'
     return gid
 
-def _gid(pattern):
-    cmd = [_get_gid_cmd(), pattern]
-    process = subprocess.Popen(cmd,
+def _execute(args):
+    process = subprocess.Popen(args,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     text = process.stdout.read()
@@ -243,12 +246,52 @@ def _gid(pattern):
         return result
     return text.split('\n')
 
+def _gid(pattern):
+    cmd = [_get_gid_cmd(), pattern]
+    return _execute(cmd)
+
+def _lid(pattern, args):
+    cmd = ['lid'] + args + [pattern]
+    return _execute(cmd)
+
+def _highlight(pattern, text):
+    def red(text):
+        return '\033[1;31m%s\033[0m' % text
+
+    # Find all begin indexes of case-insensitive substring.
+    begins = []
+    base = 0
+    pl = pattern.lower()
+    tl = text.lower()
+    while True:
+        try:
+            offset = tl.index(pl)
+            begins.append(base + offset)
+            tl = tl[offset + len(pl):]
+            base += offset + len(pl)
+        except Exception, e:
+            break
+
+    if not begins:
+        return text
+
+    # Highlight matched case-insensitive substrings.
+    result = []
+    last_end = 0
+    for begin in begins:
+        if begin > last_end:
+            result.append(text[last_end:begin])
+        end = begin + len(pattern)
+        result.append(red(text[begin:end]))
+        last_end = end
+    if last_end < len(text):
+        result.append(text[last_end:])
+
+    return ''.join(result)
+
 def _show_list(matches, patterns, last_n, fold):
     def yellow(text):
         return '\033[1;33m%s\033[0m' % text
-
-    def yellow_background(text):
-        return '\033[30;43m%s\033[0m' % text
 
     def green(text):
         return '\033[1;32m%s\033[0m' % text
@@ -272,7 +315,7 @@ def _show_list(matches, patterns, last_n, fold):
         else:
             code = m.text
             for pattern in patterns:
-                code = code.replace(pattern, yellow_background(pattern))
+                code = _highlight(pattern, code)
             print '(%s) %s:%s:%s' % (red(i), yellow(m.line_num), green(m.filename), code)
 
 def _filter_statement(all_, exclude):
@@ -280,12 +323,6 @@ def _filter_statement(all_, exclude):
     if not exclude:
         return matches
     return _subtract_list(all_, matches)
-
-def _filter_filename(all_, pattern, exclude):
-    matched = [m for m in all_ if re.search(pattern, m.filename)]
-    if not exclude:
-        return matched
-    return _subtract_list(all_, matched)
 
 def _filter_pattern(matches, pattern):
     negative_symbol = '~'
