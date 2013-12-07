@@ -92,6 +92,14 @@ If you don't use [Vim] as your main editor, please set the environment variable 
 However, currently only [Vim] supports "jump to the line" and "highlight the searched pattern" when opening
 the file.
 
+Other useful arguments:
+
+```bash
+$ gj -s LITERAL         # Show all symbols which contain LITERAL (case-insensitive)
+$ gj -sv LITERAL        # Same as above, but also display file lists for each symbol.
+$ gj -d1 PATTERN        # Try to find out PATTERN's definition or declaration. Work for C++ or Python.
+```
+
 
 ### Vim Plugin ###
 
