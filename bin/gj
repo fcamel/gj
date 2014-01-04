@@ -18,8 +18,19 @@ __author__ = 'fcamel'
 #------------------------------------------------------------------------------
 # Configuration
 #------------------------------------------------------------------------------
-def _gen_vim_command(filename, line, pattern):
-    return 'vim %s -c/%s +%s' % (filename, pattern, line)
+def _gen_vim_command(matches, patterns):
+    p = patterns[0]
+    if len(matches) == 1:
+        m = matches[0]
+        return 'vim %s -c/%s +%s' % (m.filename, p, m.line_num)
+    else:
+        fs = [m.filename for m in matches]
+        return 'vim %s -c/%s -p' % (' '.join(fs), p)
+
+def _gen_general_editor_command(matches, patterns):
+    m = matches[0]
+    editor = os.environ['EDITOR']
+    return '%s %s' % (editor, m.filename)
 
 # Use vim by default.
 _gen_edit_command = _gen_vim_command
@@ -32,7 +43,7 @@ if 'EDITOR'in os.environ:
     # For a general editor, don't know how to jump to the line and highglight
     # the pattern. Only open the file.
     if editor != 'vi' and editor != 'vim':
-        _gen_edit_command = lambda filename, p, l: '%s %s' % (editor, filename)
+        _gen_edit_command = _gen_general_editor_command
 
 #------------------------------------------------------------------------------
 # main
@@ -109,16 +120,16 @@ def main():
     # Filter the rest or view the selected file.
     n = 0
     while True:
-        n, matches, patterns = gj_util.filter_until_select(matches, patterns, n)
-        if n <= 0:
-            if n < 0:
+        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n)
+        if not ns:
+            if n is None:
                 return 1
             return 0
 
         # Edit the chosen one.
-        m = matches[n - 1]
+        ms = [matches[n - 1] for n in ns]
+        ret = os.system(_gen_edit_command(ms, patterns))
 
-        ret = os.system(_gen_edit_command(m.filename, m.line_num, patterns[0]))
         if ret != 0:
             return 4
 

@@ -102,13 +102,13 @@ def filter_until_select(matches, patterns, last_n):
     while True:
         if not matches:
             print 'No file matched.'
-            return 0, matches, patterns
+            return [], matches, patterns
 
         matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
         response = raw_input(_get_prompt_help()).strip()
         if not response:
-            return 0, matches, patterns
+            return [], matches, patterns
 
         if re.match('\d+', response):
             break
@@ -141,17 +141,17 @@ def filter_until_select(matches, patterns, last_n):
     matches.sort()
 
     # Parse the selected number
-    try:
-        n = int(response)
-    except ValueError, e:
+    ns = parse_number(response)
+    if not ns:
         print 'Invalid input.'
-        return -1, matches, patterns
+        return None, matches, patterns
 
-    if n < 1 or n > len(matches):
-        print 'Invalid input.'
-        return -1, matches, patterns
+    for n in ns:
+        if n < 1 or n > len(matches):
+            print 'Invalid input.'
+            return None, matches, patterns
 
-    return n, matches, patterns
+    return ns, matches, patterns
 
 def find_declaration_or_definition(pattern, level):
     if level <= 0:
@@ -436,3 +436,26 @@ def _get_prompt_help():
                    A_FOLD, A_RESTART, A_RESTART)
     )
     return msg
+
+def parse_number(line):
+    '''
+    Expected input:
+        3
+        3,5
+        3, 5, 7-10
+    '''
+    ns = set()
+    ts = line.split(',')
+    for t in ts:
+        try:
+            ns.add(int(t))
+            continue
+        except Exception, e:
+            pass
+
+        m = re.match('(\d+)-(\d+)', t.strip())
+        if m:
+            from_, to = map(int, m.groups())
+            ns.update(range(from_, to + 1))
+
+    return sorted(ns)
