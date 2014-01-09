@@ -25,7 +25,7 @@ def _gen_vim_command(matches, patterns):
         return 'vim %s -c/%s +%s' % (m.filename, p, m.line_num)
     else:
         fs = [m.filename for m in matches]
-        return 'vim %s -c/%s -p' % (' '.join(fs), p)
+        return 'vim %s -c/%s -p' % (' '.join(sorted(set(fs))), p)
 
 def _gen_general_editor_command(matches, patterns):
     m = matches[0]
