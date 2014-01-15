@@ -264,6 +264,7 @@ def _get_gid_cmd():
     return gid
 
 def _execute(args):
+    # TODO(fcamel): add a global flag to turn on/off debug message.
     process = subprocess.Popen(args,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
@@ -271,14 +272,18 @@ def _execute(args):
     try:
         text = text.decode('utf8')
     except Exception, e:
-        print 'cmd: <%s> returns non-utf8 result.' % cmd
+        print '-' * 80
+        print '\ntext: <%s>\nreturns non-utf8 result.' % text
+        print '-' * 80
         result = []
         for line in text.split('\n'):
             try:
                 line = line.decode('utf8')
                 result.append(line)
             except Exception, e:
+                print '-' * 80
                 print '%s: skip <%s>' % (e, line)
+                print '-' * 80
         return result
     return text.split('\n')
 
