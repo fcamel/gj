@@ -422,7 +422,7 @@ def _find_possible_filename(pattern):
     if re.search('[A-Z]', pattern):  # assume it's a camcelcase pattern
         return (to_underscore(pattern), pattern)
     else:  # assume it's an underscore pattern
-        return (pattern, to_camcelcase(pattern))
+        return (pattern, to_camelcase(pattern))
 
 # TODO(fcamel): modulize filter actions and combine help message and filter actions together.
 def _get_prompt_help():
