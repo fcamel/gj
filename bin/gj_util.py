@@ -428,7 +428,7 @@ def _find_possible_filename(pattern):
 def _get_prompt_help():
     msg = (
         '\nSelect an action:'
-        '\n* Input number to select a file.'
+        '\n* Input number to select a file. Multiple choices are allowed (e.g., type "1-3, 5")'
         '\n* Type "%s" / "%s" to keep / remove statements.'
         '\n* Type "%s" to switch between all matches and fold matches.'
         '\n* Type STRING (regex) to filter filename. !STRING means exclude '
