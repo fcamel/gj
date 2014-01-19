@@ -103,11 +103,12 @@ $ gj -d1 PATTERN        # Try to find out PATTERN's definition or declaration. W
 Examples of using [gj] for special scenarios:
 
 ```bash
-$ gj TYPE_NAME typedef        # Find the declaration of typedef TYPE_NAME.
-$ gj CLASS_NAME METHOD_NAME   # Find definition of a C++ method.
-$ gj FILE_NAME include        # Find out all files which include FILE_NAME.
-                              # You can enter "1-N" to select all files. This is useful to
-                              # refactor include paths after moving a header to a different path.
+$ gj TYPE typedef       # Find the declaration of typedef TYPE.
+$ gj CLASS public       # Find all classes which inherit from CLASS
+$ gj CLASS METHOD       # Find definition of a C++ method.
+$ gj FILE include       # Find all files which include FILE.
+                        # You can enter "1-N" to select all files. This is useful to
+                        # refactor include paths after moving a header to a different path.
 ```
 forget method name: gj -s SUBSTRING
 need to filter by file name: gj -s -v SUBSTRING
