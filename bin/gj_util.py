@@ -220,7 +220,7 @@ def find_symbols(pattern, verbose=False):
             ts.append(tk)
             current_length += length
 
-        if not ts:
+        if ts:
             prefix = '' if first_line else ' ' * indent
             result.append(prefix + ' '.join(ts))
 
