@@ -84,7 +84,7 @@ $ export PATH="$PATH:`pwd`/bin"
 $ cd /path/to/project/
 $ gj -i                 # Build the index.
 $ gj PATTERN            # Find out PATTERN
-$ gj -p base PATTERN    # Find out PATTERN which under base folder
+$ gj -p BASE PATTERN    # Find out PATTERN which under BASE folder
 ```
 
 Then follow the instructions in terminal. 
