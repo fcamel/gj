@@ -126,7 +126,7 @@ def main():
         matches = gj_util.find_declaration_or_definition(patterns[0],
                                                          options.declaration)
     else:
-        matches = gj_util.get_list()
+        matches = gj_util.get_list(path_prefix=options.path)
 
     # Run in batch mode?
     if options.batch:
@@ -138,7 +138,7 @@ def main():
     # Filter the rest or view the selected file.
     n = 0
     while True:
-        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n, options.path)
+        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n)
         if not ns:
             if n is None:
                 return 1

@@ -71,7 +71,7 @@ def build_index():
     path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
     return _mkid(path)
 
-def get_list(patterns=None):
+def get_list(patterns=None, path_prefix=None):
     if patterns is None:
         patterns = get_list.original_patterns
     first_pattern = patterns[0]
@@ -83,11 +83,13 @@ def get_list(patterns=None):
     for pattern in patterns[1:]:
         matches = _filter_pattern(matches, pattern)
 
+    if path_prefix:
+        matches = _filter_filename(matches, '^' + path_prefix, False)
     return sorted(matches)
 
 get_list.original_patterns = []
 
-def filter_until_select(matches, patterns, last_n, path_prefix):
+def filter_until_select(matches, patterns, last_n):
     '''
     Return:
         >0: selected number.
@@ -104,8 +106,6 @@ def filter_until_select(matches, patterns, last_n, path_prefix):
             print 'No file matched.'
             return [], matches, patterns
 
-        if path_prefix:
-          matches = _filter_filename(matches, '^' + path_prefix, False)
         matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
         response = raw_input(_get_prompt_help()).strip()
