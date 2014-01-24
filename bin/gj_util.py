@@ -71,9 +71,9 @@ def build_index():
     path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
     return _mkid(path)
 
-def get_list(patterns=None, path_prefix=None):
+def find_matches(patterns=None, path_prefix=None):
     if patterns is None:
-        patterns = get_list.original_patterns
+        patterns = find_matches.original_patterns
     first_pattern = patterns[0]
 
     lines = _gid(first_pattern)
@@ -87,7 +87,7 @@ def get_list(patterns=None, path_prefix=None):
         matches = _filter_filename(matches, '^' + path_prefix, False)
     return sorted(matches)
 
-get_list.original_patterns = []
+find_matches.original_patterns = []
 
 def filter_until_select(matches, patterns, last_n):
     '''
@@ -126,10 +126,10 @@ def filter_until_select(matches, patterns, last_n):
 
         if response[0] == A_RESTART:
             if len(response) == 1:
-                matches = get_list()
+                matches = find_matches()
             else:
                 patterns = response[1:].split()
-                matches = get_list(patterns)
+                matches = find_matches(patterns)
             continue
 
         # Clean/Keep based on filename
@@ -163,10 +163,10 @@ def find_declaration_or_definition(pattern, level):
     if pattern.startswith('m_') or pattern.startswith('s_'):
         # For non-static member fields or static member fields,
         # find symobls in header files.
-        matches = get_list([pattern])
+        matches = find_matches([pattern])
         return _filter_filename(matches, '\.h$', False)
 
-    matches = tuple(get_list([pattern]))
+    matches = tuple(find_matches([pattern]))
     # Find declaration if possible.
     result = set()
     for type_ in ('class', 'struct', 'enum'):

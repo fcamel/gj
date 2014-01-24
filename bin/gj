@@ -121,12 +121,12 @@ def main():
         return 0
 
     # Find the initial matched set.
-    gj_util.get_list.original_patterns = patterns
+    gj_util.find_matches.original_patterns = patterns
     if options.declaration > 0:
         matches = gj_util.find_declaration_or_definition(patterns[0],
                                                          options.declaration)
     else:
-        matches = gj_util.get_list(path_prefix=options.path)
+        matches = gj_util.find_matches(path_prefix=options.path)
 
     # Run in batch mode?
     if options.batch:
