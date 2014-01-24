@@ -94,6 +94,9 @@ def main():
     parser.add_option('-v', '--verbose', dest='verbose',
                       action='store_true', default=False,
                       help='Display more information (default: False).')
+    parser.add_option('-p', '--path', dest='path',
+                      type='string', default='',
+                      help='Search symbols under specific path.')
     options, args = parser.parse_args()
 
     if options.index:
@@ -135,7 +138,7 @@ def main():
     # Filter the rest or view the selected file.
     n = 0
     while True:
-        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n)
+        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n, options.path)
         if not ns:
             if n is None:
                 return 1
