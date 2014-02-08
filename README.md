@@ -84,6 +84,7 @@ $ export PATH="$PATH:`pwd`/bin"
 $ cd /path/to/project/
 $ gj -i                 # Build the index.
 $ gj PATTERN            # Find out PATTERN
+$ gj -p BASE PATTERN    # Find out PATTERN which under BASE folder
 ```
 
 Then follow the instructions in terminal. 
@@ -100,6 +101,19 @@ $ gj -sv LITERAL        # Same as above, but also display file lists for each sy
 $ gj -d1 PATTERN        # Try to find out PATTERN's definition or declaration. Work for C++ or Python.
 ```
 
+Examples of using [gj] for special scenarios:
+
+```bash
+$ gj TYPE typedef       # Find the declaration of typedef TYPE.
+$ gj CLASS public       # Find all classes which inherit from CLASS
+$ gj CLASS METHOD       # Find definition of a C++ method.
+$ gj FILE include       # Find all files which include FILE.
+                        # You can enter "1-N" to select all files. This is useful to
+                        # refactor include paths after moving a header to a different path.
+```
+forget method name: gj -s SUBSTRING
+need to filter by file name: gj -s -v SUBSTRING
+find assignment via "=": gj SYMBOL = 
 
 ### Vim Plugin ###
 
@@ -121,6 +135,13 @@ Then use the following commands in quickfix window:
 * `gv`: open in vertical split silently.
 * `q` : close the quickfix window.
 
+## Todo ##
+
+* Improve `-d`'s speed.
+* Improve `-d`'s accuracy.
+* Support Emacs as well.
+* Add more screenshots.
+
 
 [gj]:https://github.com/fcamel/gj
 [gj.vim]:https://github.com/fcamel/gj/blob/master/plugin/gj.vim
@@ -128,10 +149,3 @@ Then use the following commands in quickfix window:
 [ID Utils]:http://www.gnu.org/software/idutils/
 [Vundle]:http://github.com/gmarik/vundle
 [ack.vim]:https://github.com/mileszs/ack.vim
-
-## Todo ##
-
-* Improve `-d`'s speed.
-* Improve `-d`'s accuracy.
-* Support Emacs as well.
-* Add more screenshots.

@@ -71,9 +71,9 @@ def build_index():
     path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
     return _mkid(path)
 
-def get_list(patterns=None):
+def find_matches(patterns=None, path_prefix=None):
     if patterns is None:
-        patterns = get_list.original_patterns
+        patterns = find_matches.original_patterns
     first_pattern = patterns[0]
 
     lines = _gid(first_pattern)
@@ -83,9 +83,11 @@ def get_list(patterns=None):
     for pattern in patterns[1:]:
         matches = _filter_pattern(matches, pattern)
 
+    if path_prefix:
+        matches = _filter_filename(matches, '^' + path_prefix, False)
     return sorted(matches)
 
-get_list.original_patterns = []
+find_matches.original_patterns = []
 
 def filter_until_select(matches, patterns, last_n):
     '''
@@ -124,10 +126,10 @@ def filter_until_select(matches, patterns, last_n):
 
         if response[0] == A_RESTART:
             if len(response) == 1:
-                matches = get_list()
+                matches = find_matches()
             else:
                 patterns = response[1:].split()
-                matches = get_list(patterns)
+                matches = find_matches(patterns)
             continue
 
         # Clean/Keep based on filename
@@ -161,10 +163,10 @@ def find_declaration_or_definition(pattern, level):
     if pattern.startswith('m_') or pattern.startswith('s_'):
         # For non-static member fields or static member fields,
         # find symobls in header files.
-        matches = get_list([pattern])
+        matches = find_matches([pattern])
         return _filter_filename(matches, '\.h$', False)
 
-    matches = tuple(get_list([pattern]))
+    matches = tuple(find_matches([pattern]))
     # Find declaration if possible.
     result = set()
     for type_ in ('class', 'struct', 'enum'):
@@ -220,7 +222,7 @@ def find_symbols(pattern, verbose=False):
             ts.append(tk)
             current_length += length
 
-        if not ts:
+        if ts:
             prefix = '' if first_line else ' ' * indent
             result.append(prefix + ' '.join(ts))
 
@@ -264,6 +266,7 @@ def _get_gid_cmd():
     return gid
 
 def _execute(args):
+    # TODO(fcamel): add a global flag to turn on/off debug message.
     process = subprocess.Popen(args,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
@@ -271,14 +274,18 @@ def _execute(args):
     try:
         text = text.decode('utf8')
     except Exception, e:
-        print 'cmd: <%s> returns non-utf8 result.' % cmd
+        print '-' * 80
+        print '\ntext: <%s>\nreturns non-utf8 result.' % text
+        print '-' * 80
         result = []
         for line in text.split('\n'):
             try:
                 line = line.decode('utf8')
                 result.append(line)
             except Exception, e:
+                print '-' * 80
                 print '%s: skip <%s>' % (e, line)
+                print '-' * 80
         return result
     return text.split('\n')
 
@@ -417,13 +424,13 @@ def _find_possible_filename(pattern):
     if re.search('[A-Z]', pattern):  # assume it's a camcelcase pattern
         return (to_underscore(pattern), pattern)
     else:  # assume it's an underscore pattern
-        return (pattern, to_camcelcase(pattern))
+        return (pattern, to_camelcase(pattern))
 
 # TODO(fcamel): modulize filter actions and combine help message and filter actions together.
 def _get_prompt_help():
     msg = (
         '\nSelect an action:'
-        '\n* Input number to select a file.'
+        '\n* Input number to select a file. Multiple choices are allowed (e.g., type "1-3, 5")'
         '\n* Type "%s" / "%s" to keep / remove statements.'
         '\n* Type "%s" to switch between all matches and fold matches.'
         '\n* Type STRING (regex) to filter filename. !STRING means exclude '

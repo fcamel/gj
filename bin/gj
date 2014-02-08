@@ -46,6 +46,21 @@ if 'EDITOR'in os.environ:
         _gen_edit_command = _gen_general_editor_command
 
 #------------------------------------------------------------------------------
+# helper methods
+#------------------------------------------------------------------------------
+def process_args(args):
+  '''
+  Replace special patterns if necessary.
+  '''
+  patterns = []
+  for arg in args:
+      if '::' in arg:  # C++ method.
+          patterns.extend(arg.split('::'))
+      else:
+          patterns.append(arg)
+  return patterns
+
+#------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
 def main():
@@ -79,6 +94,9 @@ def main():
     parser.add_option('-v', '--verbose', dest='verbose',
                       action='store_true', default=False,
                       help='Display more information (default: False).')
+    parser.add_option('-p', '--path', dest='path',
+                      type='string', default='',
+                      help='Search symbols under specific path.')
     options, args = parser.parse_args()
 
     if options.index:
@@ -93,7 +111,7 @@ def main():
         print 'Database file "ID" is not found. Have you run "gj -i"?'
         return 3
 
-    patterns = args
+    patterns = process_args(args)
 
     # Find matched symbols
     if options.symbol:
@@ -103,12 +121,12 @@ def main():
         return 0
 
     # Find the initial matched set.
-    gj_util.get_list.original_patterns = patterns
+    gj_util.find_matches.original_patterns = patterns
     if options.declaration > 0:
         matches = gj_util.find_declaration_or_definition(patterns[0],
                                                          options.declaration)
     else:
-        matches = gj_util.get_list()
+        matches = gj_util.find_matches(path_prefix=options.path)
 
     # Run in batch mode?
     if options.batch:
