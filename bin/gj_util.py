@@ -376,7 +376,10 @@ def _filter_pattern(matches, pattern):
     new_matches = []
     new_pattern = pattern[1:] if pattern.startswith(negative_symbol) else pattern
     for m in matches:
-        matched = not not re.search('\\b%s\\b' % new_pattern, m.text)
+        if new_pattern == '=':  # special case:
+            matched = not not re.search('[^=]=[^=]', m.text)
+        else:
+            matched = not not re.search('\\b%s\\b' % new_pattern, m.text)
         if pattern.startswith(negative_symbol):
             matched = not matched
         if matched:
