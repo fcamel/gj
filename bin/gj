@@ -90,7 +90,9 @@ def main():
     parser.add_option('-s', '--symbol', dest='symbol',
                       action='store_true', default=False,
                       help=('Find symbols given sub-string (case-insensitive match).'
-                            ' Display filenames when -v is applied.'))
+                            ' Display filenames when -v is applied.'
+                            ' NOTE: This option is kept for backward compatibility.'
+                            ' Use gj_symbol to get better results.'))
     parser.add_option('-v', '--verbose', dest='verbose',
                       action='store_true', default=False,
                       help='Display more information (default: False).')

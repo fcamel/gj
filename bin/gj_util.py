@@ -191,7 +191,10 @@ def find_declaration_or_definition(pattern, level):
 
     return sorted(result)
 
-def find_symbols(pattern, verbose=False):
+def find_symbols(pattern, verbose=False, path_pattern=None):
+    if path_pattern:
+        verbose = True
+
     args = ['-lis']
     if not verbose:
         args.extend(('-R', 'none'))
@@ -200,25 +203,34 @@ def find_symbols(pattern, verbose=False):
     max_width = 120
     indent = 8
     for line in lines:
+        tokens = line.split()
+        if path_pattern:
+            paths = tokens[1:]
+            matched = False
+            for p in paths:
+                if path_pattern in p:
+                    matched = True
+                    break
+            if not matched:
+                continue
+
         if len(line) < max_width:
             result.append(line)
             continue
 
-        tokens = line.split()
         first_line = True
-        first_token = True
         current_length = 0
         ts = []
-        for tk in tokens:
+        for i, tk in enumerate(tokens):
+            if i and path_pattern and path_pattern not in tk:
+                # Filter non-matched file paths
+                continue
             length = len(tk)
-            if not first_token:
-                length += 1
             if current_length + length > max_width:
                 prefix = '' if first_line else ' ' * indent
                 result.append(prefix + ' '.join(ts))
                 ts = []
                 first_line = False
-                first_token = True
                 current_length = indent;
                 length = len(tk)
 
@@ -229,7 +241,10 @@ def find_symbols(pattern, verbose=False):
             prefix = '' if first_line else ' ' * indent
             result.append(prefix + ' '.join(ts))
 
-    return [_highlight(pattern, line) for line in result if line]
+    tmp =  [_highlight(pattern, line) for line in result if line]
+    if path_pattern:
+        tmp = [_highlight(path_pattern, line, level=1) for line in tmp if line]
+    return tmp
 
 #-----------------------------------------------------------
 # private
@@ -300,9 +315,12 @@ def _lid(pattern, args):
     cmd = ['lid'] + args + [pattern]
     return _execute(cmd)
 
-def _highlight(pattern, text):
+def _highlight(pattern, text, level=2):
     def red(text):
         return '\033[1;31m%s\033[0m' % text
+
+    def green(text):
+        return '\033[1;32m%s\033[0m' % text
 
     # Find all begin indexes of case-insensitive substring.
     begins = []
@@ -328,7 +346,10 @@ def _highlight(pattern, text):
         if begin > last_end:
             result.append(text[last_end:begin])
         end = begin + len(pattern)
-        result.append(red(text[begin:end]))
+        if level >= 2:
+            result.append(red(text[begin:end]))
+        else:
+            result.append(green(text[begin:end]))
         last_end = end
     if last_end < len(text):
         result.append(text[last_end:])

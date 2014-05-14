@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+# -*- encoding: utf8 -*-
+
+'''
+gj_symbol: find out possible symbol names.
+'''
+
+import sys
+import optparse
+import os
+
+import gj_util
+
+
+__author__ = 'fcamel'
+
+
+def main():
+    '''\
+    %prog [options] <pattern>
+
+    Grep pattern in source codes using id-utils.
+    Before starting, type 'mkid' in your source root first.
+
+    Example of usages:
+        $ %prog get          # find any symbol names which contains "get".
+        $ %prog get -v       # also display the file paths beside the symbol names.
+        $ %prog get -p base  # filter out symbol names whose file paths do not contain "base".
+    '''
+    gj_util.check_install()
+
+    parser = optparse.OptionParser(usage=main.__doc__)
+    parser.add_option('-v', '--verbose', dest='verbose',
+                      action='store_true', default=False,
+                      help='Display more information (default: False).')
+    parser.add_option('-p', '--path', dest='path',
+                      type='string', default='',
+                      help='Search symbols under specific path. This also applies --verbose')
+    options, args = parser.parse_args()
+
+    if len(args) != 1:
+        parser.print_help()
+        return 2
+
+    if not os.path.exists('ID'):
+        print 'Database file "ID" is not found. Have you run "gj -i"?'
+        return 3
+
+    pattern, = args
+
+    # Find matched symbols
+    lines = gj_util.find_symbols(pattern,
+                                 verbose=options.verbose,
+                                 path_pattern=options.path)
+    for line in lines:
+        print line.encode('utf8')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
