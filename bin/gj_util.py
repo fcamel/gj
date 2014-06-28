@@ -79,8 +79,12 @@ def find_matches(patterns=None, path_prefix=None):
     lines = _gid(first_pattern)
     # gid may get unmatched pattern when the argument is a number.
     # Don't know the reason. Manually filter unmatched lines.
-    lines = [line for line in lines if first_pattern in line]
-    matches = [Match.create(line, first_pattern) for line in lines]
+    candidated_lines = []
+    for line in lines:
+        tokens = line.split(':', 2)
+        if len(tokens) == 3 and first_pattern in tokens[2]:
+            candidated_lines.append(line)
+    matches = [Match.create(line, first_pattern) for line in candidated_lines]
     matches = [m for m in matches if m]
 
     for pattern in patterns[1:]:
