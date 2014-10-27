@@ -22,7 +22,7 @@ def _gen_vim_command(matches, patterns):
     p = patterns[0]
     if len(matches) == 1:
         m = matches[0]
-        return 'vim %s -c/%s +%s' % (m.filename, p, m.line_num)
+        return 'vim "%s" -c/%s +%s' % (m.filename, p, m.line_num)
     else:
         fs = [m.filename for m in matches]
         return 'vim %s -c/%s -p' % (' '.join(sorted(set(fs))), p)
