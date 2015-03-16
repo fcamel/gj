@@ -176,7 +176,13 @@ def find_declaration_or_definition(pattern, level):
     matches = tuple(find_matches([pattern]))
     # Find declaration if possible.
     result = set()
-    for type_ in ('class', 'struct', 'enum'):
+    types = (
+        'class',
+        'struct',
+        'enum',
+        'interface',  # Java, Objective C
+    )
+    for type_ in types:
         tmp = _filter_pattern(matches, type_)
         tmp = _filter_statement(tmp, True)
         result.update(tmp)
