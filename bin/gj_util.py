@@ -64,7 +64,7 @@ def check_install():
             else:
                 msg += "  (Unknown package manager. Try to install id-utils anyway.)\n"
                 msg += "  (http://www.gnu.org/software/idutils/)"
-            print msg
+            print(msg)
             sys.exit(1)
 
 def build_index():
@@ -110,12 +110,16 @@ def filter_until_select(matches, patterns, last_n):
         filter_until_select.fold = False
     while True:
         if not matches:
-            print 'No file matched.'
+            print('No file matched.')
             return [], matches, patterns
 
         matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
-        response = raw_input(_get_prompt_help()).strip()
+        try:
+            input = raw_input
+        except NameError:
+            pass
+        response = input(_get_prompt_help()).strip()
         if not response:
             return [], matches, patterns
 
@@ -152,12 +156,12 @@ def filter_until_select(matches, patterns, last_n):
     # Parse the selected number
     ns = parse_number(response)
     if not ns:
-        print 'Invalid input.'
+        print('Invalid input.')
         return None, matches, patterns
 
     for n in ns:
         if n < 1 or n > len(matches):
-            print 'Invalid input.'
+            print('Invalid input.')
             return None, matches, patterns
 
     return ns, matches, patterns
@@ -264,8 +268,8 @@ def _mkid(lang_file):
     process = subprocess.Popen(cmd,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
-    print process.stdout.read()
-    print process.stderr.read()
+    print(process.stdout.read())
+    print(process.stderr.read())
     return True
 
 def _is_cmd_exists(cmd):
@@ -301,19 +305,19 @@ def _execute(args):
     text = process.stdout.read()
     try:
         text = text.decode('utf8')
-    except Exception, e:
-        print '-' * 80
-        print '\ntext: <%s>\nreturns non-utf8 result.' % text
-        print '-' * 80
+    except Exception as e:
+        print('-' * 80)
+        print('\ntext: <%s>\nreturns non-utf8 result.' % text)
+        print('-' * 80)
         result = []
         for line in text.split('\n'):
             try:
                 line = line.decode('utf8')
                 result.append(line)
-            except Exception, e:
-                print '-' * 80
-                print '%s: skip <%s>' % (e, line)
-                print '-' * 80
+            except Exception as e:
+                print('-' * 80)
+                print('%s: skip <%s>' % (e, line))
+                print('-' * 80)
         return result
     return text.split('\n')
 
@@ -343,7 +347,7 @@ def _highlight(pattern, text, level=2):
             begins.append(base + offset)
             tl = tl[offset + len(pl):]
             base += offset + len(pl)
-        except Exception, e:
+        except Exception as e:
             break
 
     if not begins:
@@ -388,12 +392,12 @@ def _show_list(matches, patterns, last_n, fold):
         last_filename = m.filename
         i += 1
         if i == last_n:
-            print black('(%s) %s:%s:%s' % (i, m.line_num, m.filename, m.text))
+            print(black('(%s) %s:%s:%s' % (i, m.line_num, m.filename, m.text)))
         else:
             code = m.text
             for pattern in patterns:
                 code = _highlight(pattern, code)
-            print '(%s) %s:%s:%s' % (red(i), yellow(m.line_num), green(m.filename), code)
+            print('(%s) %s:%s:%s' % (red(i), yellow(m.line_num), green(m.filename), code))
 
 def _filter_statement(all_, exclude):
     matches = [m for m in all_ if re.search(';\s*$', m.text)]
@@ -494,7 +498,7 @@ def parse_number(line):
         try:
             ns.add(int(t))
             continue
-        except Exception, e:
+        except Exception as e:
             pass
 
         m = re.match('(\d+)-(\d+)', t.strip())
