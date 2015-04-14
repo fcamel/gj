@@ -115,6 +115,7 @@ def filter_until_select(matches, patterns, last_n):
 
         matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
+        global input
         try:
             input = raw_input
         except NameError:
