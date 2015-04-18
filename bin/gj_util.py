@@ -46,10 +46,19 @@ class Match(object):
         return str(unicode(self))
 
     def __cmp__(self, other):
+        try:
+            cmp
+        except NameError:
+            cmp = lambda a, b: (a > b) - (a < b)
         r = cmp(self.filename, other.filename)
         if r:
             return r
         return cmp(self.line_num, other.line_num)
+
+    def __lt__(self, other):
+        if self.filename == other.filename:
+            return self.line_num < other.line_num
+        return self.filename < other.filename
 
 def check_install():
     for cmd in ['mkid', _get_gid_cmd()]:
@@ -115,6 +124,7 @@ def filter_until_select(matches, patterns, last_n):
 
         matches = sorted(set(matches))
         _show_list(matches, patterns, last_n, filter_until_select.fold)
+        global input
         try:
             input = raw_input
         except NameError:
