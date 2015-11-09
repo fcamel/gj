@@ -72,7 +72,7 @@ def main():
 
     Example of usages:
         $ gj MyClient         # find any snippet which contains MyClient
-        $ gj MyClient class   # find the definition.
+        $ gj MyClient class   # find the definition. MyClient and class must appear in the same line.
     '''
     gj_util.check_install()
 
@@ -81,6 +81,12 @@ def main():
                       type=int, default=0,
                       help=('Find possible declarations or definitions. '
                             'Higher level finds less result (default=0).'))
+    parser.add_option('-f', '--filter', dest='filter_',
+                      type='string', default='',
+                      help='Only keep the files which contain the target symbol. '
+                            'Useful to help filter common name such as "Start". '
+                            'For example, "Start -f MySuperThread" will find out files which '
+                            'contain MySuperThread and Start simultaneously.')
     parser.add_option('-b', '--batch', dest='batch',
                       action='store_true', default=False,
                       help='Run in batch mode (i.e., no interaction).')
@@ -128,7 +134,7 @@ def main():
         matches = gj_util.find_declaration_or_definition(patterns[0],
                                                          options.declaration)
     else:
-        matches = gj_util.find_matches(path_prefix=options.path)
+        matches = gj_util.find_matches(path_prefix=options.path, filter_=options.filter_)
 
     # Run in batch mode?
     if options.batch:

@@ -80,27 +80,35 @@ def build_index():
     path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
     return _mkid(path)
 
-def find_matches(patterns=None, path_prefix=None):
-    if patterns is None:
-        patterns = find_matches.original_patterns
-    first_pattern = patterns[0]
 
-    lines = _gid(first_pattern)
+def _find_matches(pattern):
+    lines = _gid(pattern)
     # gid may get unmatched pattern when the argument is a number.
     # Don't know the reason. Manually filter unmatched lines.
     candidated_lines = []
     for line in lines:
         tokens = line.split(':', 2)
-        if len(tokens) == 3 and first_pattern in tokens[2]:
+        if len(tokens) == 3 and pattern in tokens[2]:
             candidated_lines.append(line)
-    matches = [Match.create(line, first_pattern) for line in candidated_lines]
-    matches = [m for m in matches if m]
+    matches = [Match.create(line, pattern) for line in candidated_lines]
+    return [m for m in matches if m]
 
+
+def find_matches(patterns=None, filter_='', path_prefix=''):
+    if patterns is None:
+        patterns = find_matches.original_patterns
+    matches = _find_matches(patterns[0])
     for pattern in patterns[1:]:
         matches = _filter_pattern(matches, pattern)
 
     if path_prefix:
         matches = _filter_filename(matches, '^' + path_prefix, False)
+
+    if filter_:
+        matches_by_filter = _find_matches(filter_)
+        filenames = set(m.filename for m in matches_by_filter)
+        matches = [m for m in matches if m.filename in filenames]
+
     return sorted(matches)
 
 find_matches.original_patterns = []
@@ -215,7 +223,7 @@ def find_declaration_or_definition(pattern, level):
 
     return sorted(result)
 
-def find_symbols(pattern, verbose=False, path_pattern=None):
+def find_symbols(pattern, verbose=False, path_pattern=''):
     if path_pattern:
         verbose = True
 
