@@ -32,6 +32,7 @@
 *.py             text
 *.java           text
 *.js             text
+*.css            text
 *.php            text
 *.sh             text
 
