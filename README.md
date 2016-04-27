@@ -111,9 +111,9 @@ $ gj FILE include       # Find all files which include FILE.
                         # You can enter "1-N" to select all files. This is useful to
                         # refactor include paths after moving a header to a different path.
 ```
-forget method name: gj -s SUBSTRING
-need to filter by file name: gj -s -v SUBSTRING
-find assignment via "=": gj SYMBOL = 
+* forget method name: gj -s SUBSTRING
+* need to filter by file name: gj -s -v SUBSTRING
+* find assignment via "=": gj SYMBOL = 
 
 ### Vim Plugin ###
 
