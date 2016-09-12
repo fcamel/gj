@@ -42,6 +42,7 @@
 *.gyp            text
 *.gypi           text
 *.ninja          text
+*.gradle         text
                 
 # Other       
 *.tpl            text
