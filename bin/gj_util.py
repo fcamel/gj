@@ -22,6 +22,8 @@ A_CLEAN_STATEMENT = '!;'
 A_FOLD            = '.'
 A_RESTART         = '~'
 
+ENABLE_COLOR_OUTPUT = not sys.stdout.isatty()
+
 #-----------------------------------------------------------
 # public
 #-----------------------------------------------------------
@@ -349,10 +351,16 @@ def _lid(pattern, args):
 
 def _highlight(pattern, text, level=2):
     def red(text):
-        return '\033[1;31m%s\033[0m' % text
+        if sys.stdout.isatty():
+            return '\033[1;31m%s\033[0m' % text
+        else:
+            return text
 
     def green(text):
-        return '\033[1;32m%s\033[0m' % text
+        if sys.stdout.isatty():
+            return '\033[1;32m%s\033[0m' % text
+        else:
+            return text
 
     # Find all begin indexes of case-insensitive substring.
     begins = []
@@ -390,16 +398,28 @@ def _highlight(pattern, text, level=2):
 
 def _show_list(matches, patterns, last_n, fold):
     def yellow(text):
-        return '\033[1;33m%s\033[0m' % text
+        if sys.stdout.isatty():
+            return '\033[1;33m%s\033[0m' % text
+        else:
+            return text
 
     def green(text):
-        return '\033[1;32m%s\033[0m' % text
+        if sys.stdout.isatty():
+            return '\033[1;32m%s\033[0m' % text
+        else:
+            return text
 
     def red(text):
-        return '\033[1;31m%s\033[0m' % text
+        if sys.stdout.isatty():
+            return '\033[1;31m%s\033[0m' % text
+        else:
+            return text
 
     def black(text):
-        return '\033[1;30m%s\033[0m' % text
+        if sys.stdout.isatty():
+            return '\033[1;30m%s\033[0m' % text
+        else:
+            return text
 
     os.system('clear')
     last_filename = ''
