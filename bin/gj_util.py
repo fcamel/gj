@@ -212,6 +212,7 @@ def find_declaration_or_definition(pattern, level):
         result.update(tmp)
     result.update(_filter_pattern(matches, 'typedef'))
     result.update(_filter_pattern(matches, 'define'))
+    result.update(_filter_pattern(matches, 'using'))
     # Find definition if possible.
     result.update(_keep_possible_definition(matches, pattern))
 
