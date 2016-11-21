@@ -24,6 +24,8 @@ A_RESTART         = '~'
 
 ENABLE_COLOR_OUTPUT = not sys.stdout.isatty()
 
+DEFAULT_CODE_LENGTH = 80
+
 #-----------------------------------------------------------
 # public
 #-----------------------------------------------------------
@@ -115,13 +117,7 @@ def find_matches(patterns=None, filter_='', path_prefix=''):
 
 find_matches.original_patterns = []
 
-def filter_until_select(matches, patterns, last_n):
-    '''
-    Return:
-        >0: selected number.
-         0: normal exit.
-        <0: error.
-    '''
+def filter_until_select(matches, patterns, last_n, verbose):
     matches = matches[:]  # Make a clone.
 
     # Enter interactive mode.
@@ -133,7 +129,7 @@ def filter_until_select(matches, patterns, last_n):
             return [], matches, patterns
 
         matches = sorted(set(matches))
-        _show_list(matches, patterns, last_n, filter_until_select.fold)
+        _show_list(matches, patterns, last_n, filter_until_select.fold, verbose)
         global input
         try:
             input = raw_input
@@ -397,7 +393,7 @@ def _highlight(pattern, text, level=2):
 
     return ''.join(result)
 
-def _show_list(matches, patterns, last_n, fold):
+def _show_list(matches, patterns, last_n, fold, verbose):
     def yellow(text):
         if sys.stdout.isatty():
             return '\033[1;33m%s\033[0m' % text
@@ -434,6 +430,8 @@ def _show_list(matches, patterns, last_n, fold):
             print(black('(%s) %s:%s:%s' % (i, m.line_num, m.filename, m.text)))
         else:
             code = m.text
+            if not verbose and len(code) > DEFAULT_CODE_LENGTH:
+                code = code[:DEFAULT_CODE_LENGTH] + " ..."
             for pattern in patterns:
                 code = _highlight(pattern, code)
             print('(%s) %s:%s:%s' % (red(i), yellow(m.line_num), green(m.filename), code))

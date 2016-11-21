@@ -146,7 +146,7 @@ def main():
     # Filter the rest or view the selected file.
     n = 0
     while True:
-        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n)
+        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n, options.verbose)
         if not ns:
             if n is None:
                 return 1
