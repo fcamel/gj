@@ -77,7 +77,10 @@ def main():
     gj_util.check_install()
 
     parser = optparse.OptionParser(usage=main.__doc__)
-    parser.add_option('-d', '--declaration', dest='declaration',
+    parser.add_option('-d', '--decdef', dest='decdef',
+                      action='store_true', default=False,
+                      help=('Find possible declarations or definitions. '))
+    parser.add_option('-D', '--definition', dest='definition',
                       action='store_true', default=False,
                       help=('Find possible declarations or definitions. '))
     parser.add_option('-f', '--filter', dest='filter_',
@@ -129,8 +132,10 @@ def main():
 
     # Find the initial matched set.
     gj_util.find_matches.original_patterns = patterns
-    if options.declaration:
+    if options.decdef:
         matches = gj_util.find_declaration_or_definition(patterns[0])
+    elif options.definition:
+        matches = gj_util.find_definition(patterns[0])
     else:
         matches = gj_util.find_matches(path_prefix=options.path, filter_=options.filter_)
 

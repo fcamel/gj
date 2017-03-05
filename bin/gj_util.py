@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
+import cPickle
 import os
 import platform
 import re
@@ -14,13 +15,14 @@ __author__ = 'fcamel'
 # Configuration
 #------------------------------------------------------------------------------
 
-LANG_MAP_FILE     = "id-lang.map"
+LANG_MAP_FILE         = "id-lang.map"
+DEFINITION_INDEX_FILE = 'gj.index'
 
 # Input mappings
-A_KEEP_STATEMENT  = ';'
-A_CLEAN_STATEMENT = '!;'
-A_FOLD            = '.'
-A_RESTART         = '~'
+A_KEEP_STATEMENT       = ';'
+A_CLEAN_STATEMENT      = '!;'
+A_FOLD                 = '.'
+A_RESTART              = '~'
 
 ENABLE_COLOR_OUTPUT = not sys.stdout.isatty()
 
@@ -44,6 +46,10 @@ class Match(object):
             return None
         return Match(tokens, pattern)
 
+    @staticmethod
+    def sort_key(match):
+        return (match.filename, match.line_num)
+
     def __unicode__(self):
         tokens = [self.filename, self.line_num, self.column, self.text]
         return u':'.join(map(unicode, tokens))
@@ -51,20 +57,53 @@ class Match(object):
     def __str__(self):
         return str(unicode(self))
 
-    def __cmp__(self, other):
-        try:
-            cmp
-        except NameError:
-            cmp = lambda a, b: (a > b) - (a < b)
-        r = cmp(self.filename, other.filename)
-        if r:
-            return r
-        return cmp(self.line_num, other.line_num)
 
-    def __lt__(self, other):
-        if self.filename == other.filename:
-            return self.line_num < other.line_num
-        return self.filename < other.filename
+# Used by finding definition.
+class FileLine(object):
+    def __init__(self, path, line):
+        self.path = path
+        self.line = line
+
+    def __eq__(self, other):
+        return self.path == other.path and self.line == other.line
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __str__(self):
+        return '%s:%d' % (self.path, self.line)
+
+    def __repr__(self):
+        return str(self)
+
+
+# Used by finding definition.
+class SymbolInfo(object):
+    @staticmethod
+    def sort_key(info):
+        return (info.symbol, info.full)
+
+    def __init__(self, symbol, full, fileline):
+        self.symbol = symbol
+        self.full = full
+        self.fileline = fileline
+
+    def __eq__(self, other):
+        return (self.symbol == other.symbol and self.full == other.full
+                and self.fileline == other.fileline)
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __str__(self):
+        return '(%s, %s, %s)' % (self.symbol, self.full, self.fileline)
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(self.full)
+
 
 def check_install():
     for cmd in ['mkid', _get_gid_cmd()]:
@@ -115,7 +154,7 @@ def find_matches(patterns=None, filter_='', path_prefix=''):
         filenames = set(m.filename for m in matches_by_filter)
         matches = [m for m in matches if m.filename in filenames]
 
-    return sorted(matches)
+    return sorted(matches, key=Match.sort_key)
 
 find_matches.original_patterns = []
 
@@ -131,7 +170,7 @@ def choose_matches_interactively(matches, patterns, last_n, verbose):
             print('No file matched.')
             return [], matches, patterns
 
-        matches = sorted(set(matches))
+        matches = sorted(set(matches), key=Match.sort_key)
         _show_list(matches, patterns, last_n, choose_matches_interactively.fold, verbose)
         global input
         try:
@@ -176,7 +215,7 @@ def choose_matches_interactively(matches, patterns, last_n, verbose):
             exclude = False
         matches = _filter_filename(matches, response, exclude)
 
-    matches.sort()
+    matches.sort(key=Match.sort_key)
 
     # Parse the selected number
     numbers = parse_number(response)
@@ -217,7 +256,35 @@ def find_declaration_or_definition(pattern):
     # Find definition if possible.
     result.update(_keep_possible_definition(matches, pattern))
 
-    return sorted(result)
+    return sorted(result, key=Match.sort_key)
+
+def find_definition(symbol):
+    result = []
+    begin = end = 0
+    index_offset = 0
+    with open(DEFINITION_INDEX_FILE, 'rb') as fr:
+        # format: [(symbol, offset)]
+        info_index = cPickle.load(fr)
+        index_offset = fr.tell()
+        for i, (s, offset) in enumerate(info_index):
+            if s > symbol:
+                end = i
+                break
+        for i in range(end - 1, 0, -1):
+            if info_index[i][0] < symbol:
+                begin = i
+                break
+
+        for i in range(begin, end):
+            fr.seek(index_offset + info_index[i][1])
+            infos = cPickle.load(fr)
+            for info in infos:
+                if info.symbol == symbol:
+                    string = '%s:%d:%s' % (info.fileline.path, info.fileline.line, info.full)
+                    match = Match.create(string, symbol)
+                    result.append(match)
+
+    return sorted(result, key=Match.sort_key)
 
 def find_symbols(pattern, verbose=False, path_pattern=''):
     if path_pattern:
