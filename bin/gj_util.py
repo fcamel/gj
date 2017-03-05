@@ -105,7 +105,7 @@ def find_matches(patterns=None, filter_='', path_prefix=''):
         patterns = find_matches.original_patterns
     matches = _find_matches(patterns[0])
     for pattern in patterns[1:]:
-        matches = _filter_pattern(matches, pattern)
+        matches = _filter_matches(matches, pattern)
 
     if path_prefix:
         matches = _filter_filename(matches, '^' + path_prefix, False)
@@ -119,25 +119,32 @@ def find_matches(patterns=None, filter_='', path_prefix=''):
 
 find_matches.original_patterns = []
 
-def filter_until_select(matches, patterns, last_n, verbose):
+def choose_matches_interactively(matches, patterns, last_n, verbose):
     matches = matches[:]  # Make a clone.
 
-    # Enter interactive mode.
-    if not hasattr(filter_until_select, 'fold'):
-        filter_until_select.fold = False
+    if not hasattr(choose_matches_interactively, 'fold'):
+        choose_matches_interactively.fold = False
+
+    # Enter the interactive mode.
     while True:
         if not matches:
             print('No file matched.')
             return [], matches, patterns
 
         matches = sorted(set(matches))
-        _show_list(matches, patterns, last_n, filter_until_select.fold, verbose)
+        _show_list(matches, patterns, last_n, choose_matches_interactively.fold, verbose)
         global input
         try:
             input = raw_input
         except NameError:
             pass
-        response = input(_get_prompt_help()).strip()
+
+        response = None
+        try:
+            response = input(_get_prompt_help()).strip()
+        except (EOFError, KeyboardInterrupt) as e:
+            print('')
+
         if not response:
             return [], matches, patterns
 
@@ -150,7 +157,7 @@ def filter_until_select(matches, patterns, last_n, verbose):
             continue
 
         if response == A_FOLD:
-            filter_until_select.fold = not filter_until_select.fold
+            choose_matches_interactively.fold = not choose_matches_interactively.fold
             continue
 
         if response[0] == A_RESTART:
@@ -172,17 +179,17 @@ def filter_until_select(matches, patterns, last_n, verbose):
     matches.sort()
 
     # Parse the selected number
-    ns = parse_number(response)
-    if not ns:
+    numbers = parse_number(response)
+    if not numbers:
         print('Invalid input.')
         return None, matches, patterns
 
-    for n in ns:
+    for n in numbers:
         if n < 1 or n > len(matches):
             print('Invalid input.')
             return None, matches, patterns
 
-    return ns, matches, patterns
+    return numbers, matches, patterns
 
 def find_declaration_or_definition(pattern, level):
     if level <= 0:
@@ -205,12 +212,12 @@ def find_declaration_or_definition(pattern, level):
         'interface',  # Java, Objective C
     )
     for type_ in types:
-        tmp = _filter_pattern(matches, type_)
+        tmp = _filter_matches(matches, type_)
         tmp = _filter_statement(tmp, True)
         result.update(tmp)
-    result.update(_filter_pattern(matches, 'typedef'))
-    result.update(_filter_pattern(matches, 'define'))
-    result.update(_filter_pattern(matches, 'using'))
+    result.update(_filter_matches(matches, 'typedef'))
+    result.update(_filter_matches(matches, 'define'))
+    result.update(_filter_matches(matches, 'using'))
     # Find definition if possible.
     result.update(_keep_possible_definition(matches, pattern))
 
@@ -445,13 +452,14 @@ def _filter_statement(all_, exclude):
         return matches
     return _subtract_list(all_, matches)
 
-def _filter_pattern(matches, pattern):
+def _filter_matches(matches, pattern):
     negative_symbol = '~'
 
     new_matches = []
     new_pattern = pattern[1:] if pattern.startswith(negative_symbol) else pattern
     for m in matches:
-        if new_pattern == '=':  # special case:
+        # Special case: find the assignment operation and exclude equality operators.
+        if new_pattern == '=':
             matched = not not re.search('[^=]=[^=]', m.text)
         else:
             matched = not not re.search('\\b%s\\b' % new_pattern, m.text)

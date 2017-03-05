@@ -146,15 +146,15 @@ def main():
     # Filter the rest or view the selected file.
     n = 0
     while True:
-        ns, matches, patterns = gj_util.filter_until_select(matches, patterns, n, options.verbose)
-        if not ns:
+        numbers, matches, patterns = gj_util.choose_matches_interactively(matches, patterns, n, options.verbose)
+        if not numbers:
             if n is None:
                 return 1
             return 0
 
         # Edit the chosen one.
-        ms = [matches[n - 1] for n in ns]
-        ret = os.system(_gen_edit_command(ms, patterns))
+        matches = [matches[n - 1] for n in numbers]
+        ret = os.system(_gen_edit_command(matches, patterns))
 
         if ret != 0:
             return 4
