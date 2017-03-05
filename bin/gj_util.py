@@ -191,11 +191,7 @@ def choose_matches_interactively(matches, patterns, last_n, verbose):
 
     return numbers, matches, patterns
 
-def find_declaration_or_definition(pattern, level):
-    if level <= 0:
-        return []
-
-    # Level 1 Rules:
+def find_declaration_or_definition(pattern):
     if pattern.startswith('m_') or pattern.startswith('s_'):
         # For non-static member fields or static member fields,
         # find symobls in header files.
@@ -220,14 +216,6 @@ def find_declaration_or_definition(pattern, level):
     result.update(_filter_matches(matches, 'using'))
     # Find definition if possible.
     result.update(_keep_possible_definition(matches, pattern))
-
-    # Level 2 Rules:
-    if level > 1:
-        # Treat pattern as file name to filter results.
-        old_result = result
-        result = set()
-        for filename in _find_possible_filename(pattern):
-            result.update(_filter_filename(old_result, filename, False))
 
     return sorted(result)
 
