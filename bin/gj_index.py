@@ -13,7 +13,7 @@ import gj_util
 
 DEBUG = False
 
-def get_symbols_and_address_in_code_section(program):
+def _get_symbols_and_address_in_code_section(program):
     proc = subprocess.Popen(['nm', '-C', program], stdout=subprocess.PIPE)
     result = []
     lines = proc.stdout.read().split('\n')
@@ -30,7 +30,7 @@ def get_symbols_and_address_in_code_section(program):
             result.append((symbol, address))
     return result
 
-def get_addresses_and_file_lines(program, addresses=None):
+def _get_addresses_and_file_lines(program, addresses=None):
     proc = subprocess.Popen(['objdump', '--dwarf=decodedline', program], stdout=subprocess.PIPE)
     result = []
     lines = proc.stdout.read().split('\n')
@@ -57,7 +57,7 @@ def get_addresses_and_file_lines(program, addresses=None):
 
     return result
 
-def remove_nested_parenthesis(string, left, right, keep_top):
+def _remove_nested_parenthesis(string, left, right, keep_top):
     valid_tokens = []
     valid_begin = -1
     depth = 0
@@ -85,7 +85,7 @@ def remove_nested_parenthesis(string, left, right, keep_top):
 
     return ''.join(valid_tokens)
 
-def get_symbol(full_symbol):
+def _get_symbol(full_symbol):
     if not full_symbol:
         return full_symbol
 
@@ -98,9 +98,9 @@ def get_symbol(full_symbol):
     # * A::B::C((anonymous namespace))
 
     # Remove the templates ( <...> ).
-    valid_full_symbol = remove_nested_parenthesis(full_symbol, '<', '>', False)
+    valid_full_symbol = _remove_nested_parenthesis(full_symbol, '<', '>', False)
     # Remove the nested parathenese ( () inside () ).
-    valid_full_symbol = remove_nested_parenthesis(valid_full_symbol, '(', ')', True)
+    valid_full_symbol = _remove_nested_parenthesis(valid_full_symbol, '(', ')', True)
 
     if 'operator()' in valid_full_symbol:
         # NOTE: inner class in operator()() is not handle.
@@ -110,12 +110,12 @@ def get_symbol(full_symbol):
     target = ts[-2] if len(ts) > 2 else ts[0]
     return target.split('::')[-1]
 
-def update_index(program, path_substituion, mapping):
+def _update_index(program, path_substituion, mapping):
     path_from, path_to = path_substituion
     # Load the debug info.
-    symbols_and_addresses = get_symbols_and_address_in_code_section(program)
+    symbols_and_addresses = _get_symbols_and_address_in_code_section(program)
     addresses = set(a for _, a in symbols_and_addresses)
-    addresses_and_filelines = get_addresses_and_file_lines(program, addresses)
+    addresses_and_filelines = _get_addresses_and_file_lines(program, addresses)
     addresses_to_filelines = {}
     for addr, fl in addresses_and_filelines:
         if path_from is not None and fl.path.startswith(path_from):
@@ -132,7 +132,7 @@ def update_index(program, path_substituion, mapping):
         fl = addresses_to_filelines.get(address, None)
         if fl is None:
             continue
-        symbol = get_symbol(full_symbol)
+        symbol = _get_symbol(full_symbol)
         info = gj_util.SymbolInfo(symbol, full_symbol, fl)
         data = mapping.get(symbol, None)
         if data is None:
@@ -146,7 +146,7 @@ def update_index(program, path_substituion, mapping):
 
         mapping[symbol].add(info)
 
-def save(mapping, filename):
+def _save(mapping, filename):
     infos = []
     for symbol in mapping:
         data = mapping[symbol]
@@ -187,6 +187,26 @@ def save(mapping, filename):
     finally:
         shutil.rmtree(dirpath)
 
+def index(programs, substitution):
+    mapping = {}
+    for program in programs:
+        print 'Index %s ...' % program
+        _update_index(program, substitution, mapping)
+
+    if DEBUG:
+        print '-' * 80
+        print 'DEBUG: (Begin) Dump the result.'
+        print '-' * 80
+        for symbol in mapping:
+            print mapping[symbol]
+        print '-' * 80
+        print 'DEBUG: (End  ) Dump the result.'
+        print '-' * 80
+
+    _save(mapping, gj_util.DEFINITION_INDEX_FILE)
+
+    print 'Done. Save the index to %s' % gj_util.DEFINITION_INDEX_FILE
+
 def main():
     '''\
     %prog [options] <program> ...
@@ -210,28 +230,11 @@ def main():
         return 1
 
     DEBUG = options.debug
-    path_from = path_to = None
+    path_substitution = [None, None]
     if options.substitution:
-        path_from, path_to = options.substitution.split('=')
+         path_substitution = options.substitution.split('=')
 
-    mapping = {}
-    for program in args:
-        print 'Index %s ...' % program
-        update_index(program, [path_from, path_to], mapping)
-
-    if DEBUG:
-        print '-' * 80
-        print 'DEBUG: (Begin) Dump the result.'
-        print '-' * 80
-        for symbol in mapping:
-            print mapping[symbol]
-        print '-' * 80
-        print 'DEBUG: (End  ) Dump the result.'
-        print '-' * 80
-
-    save(mapping, gj_util.DEFINITION_INDEX_FILE)
-
-    print 'Done. Save the index to %s' % gj_util.DEFINITION_INDEX_FILE
+    index(args, path_substitution)
 
     return 0
 
