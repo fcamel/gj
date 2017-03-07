@@ -31,28 +31,47 @@ def _get_symbols_and_address_in_code_section(program):
     return result
 
 def _get_addresses_and_file_lines(program, addresses=None):
-    proc = subprocess.Popen(['objdump', '--dwarf=decodedline', program], stdout=subprocess.PIPE)
+    # objdump (2.24 and 2.28) has a bug that "--wide" doesn't work because it never sets the flag "do_wide".
+    # On the other hand, "readelf --wide" works.
+    # Reference: binutils/dwarf.c display_debug_lines_decoded() and "const unsigned int MAX_FILENAME_LENGTH = 35;"
+    #proc = subprocess.Popen(['objdump', '--dwarf=decodedline', '--wide', program], stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['readelf', '--debug-dump=decodedline', '--wide', program], stdout=subprocess.PIPE)
     result = []
     lines = proc.stdout.read().split('\n')
-    path = None
+    cu_path = cu_filename = path = filename = None
     for line in lines:
         if len(line) > 0 and line[-1] == ':':
             # A new section with a new path.
+            is_cu_path = False
             path = line[:-1]
-            if path.startswith("CU: "):
+            if path.startswith("CU: "): # A new compilation unit.
+                is_cu_path = True
                 path = path[4:]
             if path.startswith('/'):
                 path = os.path.abspath(path)  # remove unnecessary "../"
+            filename = os.path.basename(path)
+            if is_cu_path:
+                cu_path = path
+                cu_filename = filename
             continue
 
         tokens = line.split()
         if len(tokens) != 3:
             continue
 
-        line, address = int(tokens[1]), tokens[2]
+        target_filename, line, address = tokens
+        line = int(line)
         # We'll end up OOM if there are too many addresses. Only keep the necessary addresses.
         if addresses is not None and address not in addresses:
             continue
+        if target_filename != filename:
+            if target_filename == cu_filename:
+                path = cu_path
+            else:
+                sys.stderr.write(
+                    'Warning: unexpected filename <%s> with CU: <%s> and path: <%s>\n'
+                     % (target_filename, cu_path, path))
+
         result.append((address, gj_util.FileLine(path, line)))
 
     return result
