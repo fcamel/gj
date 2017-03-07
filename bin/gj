@@ -156,8 +156,8 @@ def main():
             return 0
 
         # Edit the chosen one.
-        matches = [matches[n - 1] for n in numbers]
-        ret = os.system(_gen_edit_command(matches, patterns))
+        ms = [matches[n - 1] for n in numbers]
+        ret = os.system(_gen_edit_command(ms, patterns))
 
         if ret != 0:
             return 4
