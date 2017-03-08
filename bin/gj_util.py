@@ -350,8 +350,12 @@ def _mkid(lang_file):
     process = subprocess.Popen(cmd,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
-    print(process.stdout.read())
-    print(process.stderr.read())
+    stdout = process.stdout.read()
+    stderr = process.stderr.read()
+    if stdout:
+        print(stdout)
+    if stderr:
+        print(stderr)
     return True
 
 def _is_cmd_exists(cmd):
