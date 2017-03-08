@@ -69,8 +69,9 @@ def _get_addresses_and_file_lines(binary, addresses=None):
                 path = cu_path
             else:
                 sys.stderr.write(
-                    'Warning: unexpected filename <%s> with CU: <%s> and path: <%s>\n'
+                    'Warning: Skip unexpected filename <%s>. CU: <%s> and path: <%s>.\n'
                      % (target_filename, cu_path, path))
+                continue
 
         result.append((address, gj_util.FileLine(path, line)))
 
