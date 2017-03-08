@@ -17,6 +17,7 @@ __author__ = 'fcamel'
 
 LANG_MAP_FILE         = "id-lang.map"
 DEFINITION_INDEX_FILE = 'gj.index'
+CONFIG_FILE           = '.gjconfig'
 
 # Input mappings
 A_KEEP_STATEMENT       = ';'

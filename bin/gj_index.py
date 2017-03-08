@@ -224,7 +224,7 @@ def index_elf_binaries(binaries, substitution):
 
     _save(mapping, gj_util.DEFINITION_INDEX_FILE)
 
-    print 'Done. Save the index to %s' % gj_util.DEFINITION_INDEX_FILE
+    print 'Save the index to %s' % gj_util.DEFINITION_INDEX_FILE
 
 def main():
     '''\
@@ -253,7 +253,7 @@ def main():
     if options.substitution:
          path_substitution = options.substitution.split('=')
 
-    index(args, path_substitution)
+    index_elf_binaries(args, path_substitution)
 
     return 0
 

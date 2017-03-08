@@ -10,6 +10,7 @@ import optparse
 import os
 
 import gj_util
+import gj_index
 
 
 __author__ = 'fcamel'
@@ -77,12 +78,15 @@ def main():
     gj_util.check_install()
 
     parser = optparse.OptionParser(usage=main.__doc__)
+    parser.add_option('-c', '--config', dest='config',
+                      action='store_true', default=False,
+                      help=('Generate the config file ".gjconfig" in current directory.'))
     parser.add_option('-d', '--decdef', dest='decdef',
                       action='store_true', default=False,
-                      help=('Find possible declarations or definitions. '))
+                      help=('Find possible declarations or definitions.'))
     parser.add_option('-D', '--definition', dest='definition',
                       action='store_true', default=False,
-                      help=('Find possible declarations or definitions. '))
+                      help=('Find possible definitions.'))
     parser.add_option('-f', '--filter', dest='filter_',
                       type='string', default='',
                       help='Only keep the files which contain the target symbol. '
@@ -109,8 +113,51 @@ def main():
                       help='Search symbols under specific path.')
     options, args = parser.parse_args()
 
+    if options.config:
+        filename = gj_util.CONFIG_FILE
+        if os.path.exists(filename):
+            print('%s exists. Please delete it and try again.' % filename)
+            return 5
+        with open(gj_util.CONFIG_FILE, 'w') as fw:
+            example = [
+                'config = {',
+                '    "binaries": [  # Each line is an ELF binary to be indexed.',
+                '    ],',
+                '    "path_substitution": "",  # FROM=TO. E.g., "../../=" removes the prefix "../../".',
+                '}',
+                '',
+            ]
+            fw.write('\n'.join(example))
+        print('%s is created.' % filename)
+        return 0
+
     if options.index:
+        print('> Index source codes ...')
         result = gj_util.build_index()
+        result = 0
+
+        filename = gj_util.CONFIG_FILE
+        if os.path.exists(filename):
+            print('\n> Index ELF binaries ...')
+            try:
+                sandbox = {}
+                execfile(filename, sandbox)
+                config = sandbox['config']
+                binaries = config['binaries']
+                if not binaries:
+                    print('Skip beause "binaries" is empty.')
+                else:
+                    path_substitution = [None, None]
+                    if config['path_substitution']:
+                        tmp = config['path_substitution'].split('=')
+                        if len(tmp) == 2:
+                            path_substitution = tmp
+                        else:
+                            raise Exception('The format of "path_substitution" is wrong.')
+                    gj_index.index_elf_binaries(binaries, path_substitution)
+            except Exception as e:
+                print('Failed to index ELF: %s: %s' % (type(e).__name__, e.message))
+        print('\n> Done')
         return 0 if result else 1
 
     if len(args) < 1:
