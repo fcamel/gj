@@ -13,8 +13,8 @@ import gj_util
 
 DEBUG = False
 
-def _get_symbols_and_address_in_code_section(program):
-    proc = subprocess.Popen(['nm', '-C', program], stdout=subprocess.PIPE)
+def _get_symbols_and_address_in_code_section(binary):
+    proc = subprocess.Popen(['nm', '-C', binary], stdout=subprocess.PIPE)
     result = []
     lines = proc.stdout.read().split('\n')
     for line in lines:
@@ -30,12 +30,12 @@ def _get_symbols_and_address_in_code_section(program):
             result.append((symbol, address))
     return result
 
-def _get_addresses_and_file_lines(program, addresses=None):
+def _get_addresses_and_file_lines(binary, addresses=None):
     # objdump (2.24 and 2.28) has a bug that "--wide" doesn't work because it never sets the flag "do_wide".
     # On the other hand, "readelf --wide" works.
     # Reference: binutils/dwarf.c display_debug_lines_decoded() and "const unsigned int MAX_FILENAME_LENGTH = 35;"
-    #proc = subprocess.Popen(['objdump', '--dwarf=decodedline', '--wide', program], stdout=subprocess.PIPE)
-    proc = subprocess.Popen(['readelf', '--debug-dump=decodedline', '--wide', program], stdout=subprocess.PIPE)
+    #proc = subprocess.Popen(['objdump', '--dwarf=decodedline', '--wide', binary], stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['readelf', '--debug-dump=decodedline', '--wide', binary], stdout=subprocess.PIPE)
     result = []
     lines = proc.stdout.read().split('\n')
     cu_path = cu_filename = path = filename = None
@@ -129,12 +129,12 @@ def _get_symbol(full_symbol):
     target = ts[-2] if len(ts) > 2 else ts[0]
     return target.split('::')[-1]
 
-def _update_index(program, path_substituion, mapping):
+def _update_index(binary, path_substituion, mapping):
     path_from, path_to = path_substituion
     # Load the debug info.
-    symbols_and_addresses = _get_symbols_and_address_in_code_section(program)
+    symbols_and_addresses = _get_symbols_and_address_in_code_section(binary)
     addresses = set(a for _, a in symbols_and_addresses)
-    addresses_and_filelines = _get_addresses_and_file_lines(program, addresses)
+    addresses_and_filelines = _get_addresses_and_file_lines(binary, addresses)
     addresses_to_filelines = {}
     for addr, fl in addresses_and_filelines:
         if path_from is not None and fl.path.startswith(path_from):
@@ -206,11 +206,11 @@ def _save(mapping, filename):
     finally:
         shutil.rmtree(dirpath)
 
-def index(programs, substitution):
+def index_elf_binaries(binaries, substitution):
     mapping = {}
-    for program in programs:
-        print 'Index %s ...' % program
-        _update_index(program, substitution, mapping)
+    for binary in binaries:
+        print 'Index %s ...' % binary
+        _update_index(binary, substitution, mapping)
 
     if DEBUG:
         print '-' * 80
@@ -228,9 +228,9 @@ def index(programs, substitution):
 
 def main():
     '''\
-    %prog [options] <program> ...
+    %prog [options] <binary> ...
 
-    Index the function/method definitions' locations from programs.
+    Index the function/method definitions' locations from binaries.
     '''
     global DEBUG
 
