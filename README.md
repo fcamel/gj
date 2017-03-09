@@ -118,10 +118,10 @@ $ gj FILE include       # Find all files which include FILE.
 #### Advanced Feature ####
 
 [gj] supports two kinds of indexes. 
-* Index the source codes via [ID Utils].
-* Index the debug info of the ELF binaries ([DWARF]) via `readelf` and `nm`.
+* text index: Index the source codes via [ID Utils].
+* binary index: Index the debug info of the ELF binaries ([DWARF]) via `readelf` and `nm`.
 
-To use the index of [DWARF], you need to build the binaries with the debug info and tell [gj] the path of binaries:
+To use the binary index, you need to build the binaries with the debug info (e.g., `g++ -g`) and tell [gj] the path of binaries:
 
 ```bash
 $ gj -c                  # Generate the config file ".gjconfig"
@@ -132,7 +132,7 @@ $ gj -i                  # Now gj index both the source codes and the binaries.
 
 Then use `gj -D SYMBOL` to search the definitions. The result is much faster and more accurately. For example, to find `main`, we need the keywords "argc" and "argv" to filter the candidates previously. Now just `gj -D main` is enough.
 
-*NOTE* the index of [DWARF] requires `readelf` and `nm`. I only test this feature on Linux and haven't tested it on other platforms.
+**NOTE** I only test this feature on Linux and haven't tested it on other platforms.
 
 
 ### Vim Plugin ###
@@ -141,7 +141,7 @@ In Normal mode:
 
 * `<leader>g`: Find all matched files of the word under the cursor.
 * `<leader>G`: Find all possible declarations or definitions of the word under the cursor.
-* `<leader>d`: Find all possible declarations or definitions with a more strongly guess (much less results) of the word under the cursor.
+* `<leader>d`: Find all possible definitions of the word under the cursor based on the index of [DWARF].
 
 Then use the following commands in quickfix window:
 
