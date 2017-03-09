@@ -130,7 +130,7 @@ $ gj -c                  # Generate the config file ".gjconfig"
 $ gj -i                  # Now gj index both the source codes and the binaries.
 ```
 
-Now you can use `gj -D SYMBOL` to search the definitions instantly and accurately. You can just find the main by `gj -D main` without the other keywords "argc" and "argv" to filter the candidates.
+Then use `gj -D SYMBOL` to search the definitions. The result is much faster and more accurately. For example, to find `main`, we need the keywords "argc" and "argv" to filter the candidates previously. Now just `gj -D main` is enough.
 
 *NOTE* the index of [DWARF] requires `readelf` and `nm`. I only test this feature on Linux and haven't tested it on other platforms.
 
