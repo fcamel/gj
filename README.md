@@ -10,14 +10,14 @@ fast enough for large projects and it's somewhat inconvent for the first case. T
 
 The goals of [gj] from high to low are:
 
-* Low miss: it's bad to miss a caller when you refactor codes or find out who modifies the target variable.
+* Low miss: it's bad to miss a caller when you refactor codes or want to find out who modifies the target variable.
 * Speed: list possible targets instantly.
 * Less reading time: interactively narrow down to your target.
 
 [gj] is used in two ways:
 
 * Run as an interactive command line tool to edit and filter candidate files interactively.
-* As a plugin in [Vim] to find files which containt the word under the cursor.
+* As a plugin in [Vim] to find files which contain the word under the cursor.
 
 ## Demo ##
 
@@ -98,7 +98,7 @@ Other useful arguments:
 ```bash
 $ gj -s LITERAL         # Show all symbols which contain LITERAL (case-insensitive)
 $ gj -sv LITERAL        # Same as above, but also display file lists for each symbol.
-$ gj -d1 PATTERN        # Try to find out PATTERN's definition or declaration. Work for C++ or Python.
+$ gj -d PATTERN         # Try to find out PATTERN's definition or declaration. Work for C++ or Python. 
 ```
 
 Examples of using [gj] for special scenarios:
@@ -114,6 +114,26 @@ $ gj FILE include       # Find all files which include FILE.
 * forget method name: gj -s SUBSTRING
 * need to filter by file name: gj -s -v SUBSTRING
 * find assignment via "=": gj SYMBOL = 
+
+#### Advanced Feature ####
+
+[gj] supports two kinds of indexes. 
+* Index the source codes via [ID Utils].
+* Index the debug info of the ELF binaries ([DWARF]) via `readelf` and `nm`.
+
+To use the index of [DWARF], you need to build the binaries with the debug info and tell [gj] the path of binaries:
+
+```bash
+$ gj -c                  # Generate the config file ".gjconfig"
+( edit .giconfig and fill the paths of binaries. )
+
+$ gj -i                  # Now gj index both the source codes and the binaries.
+```
+
+Now you can use `gj -D SYMBOL` to search the definitions instantly and accurately. You can just find the main by `gj -D main` without the other keywords "argc" and "argv" to filter the candidates.
+
+*NOTE* the index of [DWARF] requires `readelf` and `nm`. I only test this feature on Linux and haven't tested it on other platforms.
+
 
 ### Vim Plugin ###
 
@@ -149,3 +169,4 @@ Then use the following commands in quickfix window:
 [ID Utils]:http://www.gnu.org/software/idutils/
 [Vundle]:http://github.com/gmarik/vundle
 [ack.vim]:https://github.com/mileszs/ack.vim
+[DWARF]:https://en.wikipedia.org/wiki/DWARF
