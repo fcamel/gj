@@ -24,7 +24,7 @@ def _get_symbols_and_address_in_code_section(binary):
     lines = proc.stdout.read().split('\n')
     for line in lines:
         tokens = line.strip().split(' ', 2)
-        if len(tokens) == 3 and (tokens[1] == 't' or tokens[1] == 'T'):
+        if len(tokens) == 3 and len(tokens[1]) == 1 and tokens[1] in 'tTwW':
             address, symbol = tokens[0], tokens[2]
             # Remove the prefix "000..."
             for i, d in enumerate(address):
