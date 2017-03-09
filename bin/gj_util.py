@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
-import cPickle
+try:
+    import cPickle
+except Exception as e:
+    # Python 3 doesn't have cPickle.
+    import pickle
+
 import os
 import platform
 import re

@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
-import cPickle
+try:
+    import cPickle
+except Exception as e:
+    # Python 3 doesn't have cPickle.
+    import pickle
+
 import sys
 import os
 import optparse
@@ -210,22 +215,22 @@ def _save(mapping, filename):
 def index_elf_binaries(binaries, substitution):
     mapping = {}
     for binary in binaries:
-        print 'Index %s ...' % binary
+        print('Index %s ...' % binary)
         _update_index(binary, substitution, mapping)
 
     if DEBUG:
-        print '-' * 80
-        print 'DEBUG: (Begin) Dump the result.'
-        print '-' * 80
+        print('-' * 80)
+        print('DEBUG: (Begin) Dump the result.')
+        print('-' * 80)
         for symbol in mapping:
-            print mapping[symbol]
-        print '-' * 80
-        print 'DEBUG: (End  ) Dump the result.'
-        print '-' * 80
+            print(mapping[symbol])
+        print('-' * 80)
+        print('DEBUG: (End  ) Dump the result.')
+        print('-' * 80)
 
     _save(mapping, gj_util.DEFINITION_INDEX_FILE)
 
-    print 'Save the index to %s' % gj_util.DEFINITION_INDEX_FILE
+    print('Save the index to %s' % gj_util.DEFINITION_INDEX_FILE)
 
 def main():
     '''\
