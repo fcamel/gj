@@ -2,7 +2,7 @@
 # -*- encoding: utf8 -*-
 
 try:
-    import cPickle
+    import cPickle as pickle
 except Exception as e:
     # Python 3 doesn't have cPickle.
     import pickle
@@ -196,13 +196,13 @@ def _save(mapping, filename):
             n_filename += 1
             path = os.path.join(dirpath, str(n_filename))
             with open(path, 'wb') as fw:
-                cPickle.dump(infos[i : i + block_size], fw)
+                pickle.dump(infos[i : i + block_size], fw)
             info_index.append((infos[i].symbol, byte_offset))
             byte_offset += os.stat(path).st_size
 
         with open(gj_util.DEFINITION_INDEX_FILE, 'wb') as fw:
             # Write the index first. Then write the data.
-            cPickle.dump(info_index, fw)
+            pickle.dump(info_index, fw)
 
             # Write the info blocks in order.
             for i in range(1, n_filename + 1):

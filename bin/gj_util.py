@@ -2,7 +2,7 @@
 # -*- encoding: utf8 -*-
 
 try:
-    import cPickle
+    import cPickle as pickle
 except Exception as e:
     # Python 3 doesn't have cPickle.
     import pickle
@@ -268,7 +268,7 @@ def find_definition(symbol):
     result = []
     with open(DEFINITION_INDEX_FILE, 'rb') as fr:
         # format: [(symbol, offset)]
-        info_index = cPickle.load(fr)
+        info_index = pickle.load(fr)
         begin = 0
         end = len(info_index)
         index_offset = fr.tell()
@@ -283,7 +283,7 @@ def find_definition(symbol):
 
         for i in range(begin, end):
             fr.seek(index_offset + info_index[i][1])
-            infos = cPickle.load(fr)
+            infos = pickle.load(fr)
             for info in infos:
                 if info.symbol == symbol:
                     string = '%s:%d:%s' % (info.fileline.path, info.fileline.line, info.full)
