@@ -266,11 +266,11 @@ def find_declaration_or_definition(pattern):
 
 def find_definition(symbol):
     result = []
-    begin = end = 0
-    index_offset = 0
     with open(DEFINITION_INDEX_FILE, 'rb') as fr:
         # format: [(symbol, offset)]
         info_index = cPickle.load(fr)
+        begin = 0
+        end = len(info_index)
         index_offset = fr.tell()
         for i, (s, offset) in enumerate(info_index):
             if s > symbol:
