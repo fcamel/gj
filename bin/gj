@@ -99,6 +99,9 @@ def main():
     parser.add_option('-i', '--index', dest='index',
                       action='store_true', default=False,
                       help='Build index.')
+    parser.add_option('-I', '--binary-index', dest='binary_index',
+                      action='store_true', default=False,
+                      help='Build binary index only.')
     parser.add_option('-s', '--symbol', dest='symbol',
                       action='store_true', default=False,
                       help=('Find symbols given sub-string (case-insensitive match).'
@@ -131,14 +134,18 @@ def main():
         print('%s is created.' % filename)
         return 0
 
-    if options.index:
-        print('> Index source codes ...')
-        result = gj_util.build_index()
-        result = 0
+    index_source = options.index
+    index_binary = options.index or options.binary_index
+    if index_source or index_binary:
+        result = True
+        if index_source:
+            print('> Index source codes ...')
+            print('')
+            result = gj_util.build_index()
 
         filename = gj_util.CONFIG_FILE
         if os.path.exists(filename):
-            print('\n> Index ELF binaries ...')
+            print('> Index ELF binaries ...')
             try:
                 sandbox = {}
                 execfile(filename, sandbox)
