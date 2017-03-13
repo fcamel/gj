@@ -155,6 +155,27 @@ Then use the following commands in quickfix window:
 * `gv`: open in vertical split silently.
 * `q` : close the quickfix window.
 
+## Troubleshooting ##
+
+### How to index a Ubuntu shared library? ###
+
+Take libgdbm as an example. Here is how:
+```
+$ apt-get source libgdbm3:amd64  # Get the source codes.
+$ cd gdbm-1.8.3/
+$ ./configure && make
+$ make --dry-run install | grep libtool  # Find out how to build the shared library.
+/bin/bash ./libtool --mode=install /usr/bin/install -c -T libgdbm.la /usr/local/lib/libgdbm.la
+$ mkdir local
+$ /bin/bash ./libtool --mode=install /usr/bin/install -c -T libgdbm.la `pwd`/local/libgdbm.la  # Create libgdbm.so in local/.
+$ gj_index.py local/libgdbm.so
+Index local/libgdbm.so ...
+Save the index to gj.index
+$ gj -D gdbm_close -b
+./gdbmclose.c:42:0:gdbm_close
+```
+
+
 ## Todo ##
 
 * Improve `-d`'s speed.
