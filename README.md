@@ -157,7 +157,7 @@ Then use the following commands in quickfix window:
 
 ## Troubleshooting ##
 
-### How to index a Ubuntu shared library? ###
+### How to index the shared library on Ubuntu? ###
 
 Take libgdbm as an example. Here is how:
 ```
@@ -168,11 +168,17 @@ $ make --dry-run install | grep libtool  # Find out how to build the shared libr
 /bin/bash ./libtool --mode=install /usr/bin/install -c -T libgdbm.la /usr/local/lib/libgdbm.la
 $ mkdir local
 $ /bin/bash ./libtool --mode=install /usr/bin/install -c -T libgdbm.la `pwd`/local/libgdbm.la  # Create libgdbm.so in local/.
-$ gj_index.py local/libgdbm.so
+(...)
+$ /bin/bash ./libtool --mode=install /usr/bin/install -c -T libgdbm_compat.la `pwd`/local/libgdbm_compat.la
+(...)
+$ gj_index.py local/*.so
+Index local/libgdbm_compat.so ...
 Index local/libgdbm.so ...
 Save the index to gj.index
 $ gj -D gdbm_close -b
 ./gdbmclose.c:42:0:gdbm_close
+$ gj -D dbm_delete -b
+./dbmdelete.c:45:0:dbm_delete
 ```
 
 
