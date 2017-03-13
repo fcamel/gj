@@ -1,0 +1,114 @@
+#!/bin/bash
+
+#--------------------------------------------------------------------
+# Global configurations.
+#--------------------------------------------------------------------
+
+readonly CWD=$(pwd)
+cd $(dirname $0)
+readonly ROOT=$(pwd)
+readonly TMP=${TMPDIR:-/tmp}/$(basename $0).tmp.$$
+readonly GJCONFIG='.gjconfig'
+
+#--------------------------------------------------------------------
+# Helper functions.
+#--------------------------------------------------------------------
+
+usage()
+{
+  cat << EOF
+  usage: $0 [options]
+
+  OPTIONS:
+  -h      Show this message.
+
+  Re-index (gj -I) the binaries when any of them is updated.
+EOF
+}
+
+clean_up()
+{
+  rm -f $TMP > /dev/null 2>&1
+}
+
+# echo colorful texts.
+# $1: 0-7, the color code.
+# $2 and the rest: the text.
+cecho()
+{
+  color=$1
+  shift
+  echo -e "\033[1;3${color}m$@\033[m"
+}
+
+run()
+{
+  cecho 3 "> Run $@"
+  echo
+  eval time $@  # Must use eval to process single quote.
+}
+
+main()
+{
+  # Parse arguments.
+  while getopts "h" OPTION
+  do
+    case $OPTION in
+      h)
+        usage
+        exit 1
+        ;;
+      ?)
+        usage
+        exit 2
+        ;;
+    esac
+  done
+
+  # Keep the rest arguments in $@.
+  shift $((OPTIND-1))
+
+  # Main.
+  which inotifywait > /dev/null 2>&1
+  if [ "$?" -ne 0 ]; then
+    echo "inotifywait doesn't exist. Please install it by \"apt-get install inotify-tools\""
+    exit 1
+  fi
+
+  cd $CWD
+
+  if [ ! -f $GJCONFIG ]; then
+    echo "$GJCONFIG does not exist. Please setup by \"gj -c\""
+    exit 2
+  fi
+
+  files=$(python -c "sandbox = {}; execfile('.gjconfig', sandbox); print(' '.join(sandbox['config']['binaries']))")
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to read $GJCONFIG."
+    exit 3
+  fi
+  echo "Re-index the binaries when any of them is updated."
+  echo "Start watching: $files"
+  echo "Press Ctrl+C to stop."
+  echo
+  while [ 1 ]
+  do
+    inotifywait -q -q -e ATTRIB,DELETE_SELF $files
+    cecho 6 "Some file is updated."
+    sleep 1  # Wait the binary's update completed.
+    run gj -I
+    echo 
+    echo "---------------------------------------------------------------------------"
+    echo 
+  done
+}
+
+#--------------------------------------------------------------------
+
+# Clean up when receiving signals (including Ctrl+C).
+trap "clean_up; exit 1" 1 2 3 13 15
+
+main $@
+
+clean_up
+exit 0
