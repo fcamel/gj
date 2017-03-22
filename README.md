@@ -56,11 +56,11 @@ Install [gj.vim] via [Vundle]. Please refer documents in [Vundle]: a highly reco
 [gj.vim] depends on [ack.vim], so you need to install [ack.vim], too. Add these to your `.vimrc`:
 
 ```vim
-Bundle 'mileszs/ack.vim'
-Bundle 'fcamel/gj'
+Plugin 'fcamel/gj'
+Plugin 'mileszs/ack.vim'
 ```
 
-Then launch `vim` and run `:BundleInstall`.
+Then launch `vim` and run `:VundleInstall`.
 
 In order to use the command line tool, add this to your `$HOME/.bashrc` (or other shell config file):
 
