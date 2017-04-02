@@ -53,11 +53,10 @@ Install [gj.vim] via [Vundle]. Please refer documents in [Vundle]: a highly reco
 
 #### Vim plugins ####
 
-[gj.vim] depends on [ack.vim], so you need to install [ack.vim], too. Add these to your `.vimrc`:
+Add these to your `.vimrc`:
 
 ```vim
 Plugin 'fcamel/gj'
-Plugin 'mileszs/ack.vim'
 ```
 
 Then launch `vim` and run `:VundleInstall`.
@@ -195,5 +194,4 @@ $ gj -D dbm_delete -b
 [Vim]:http://www.vim.org/
 [ID Utils]:http://www.gnu.org/software/idutils/
 [Vundle]:http://github.com/gmarik/vundle
-[ack.vim]:https://github.com/mileszs/ack.vim
 [DWARF]:https://en.wikipedia.org/wiki/DWARF
