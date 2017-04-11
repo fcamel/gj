@@ -39,6 +39,7 @@
 # Build files
 *.mk             text
 *.scons          text
+*.gn             text
 *.gyp            text
 *.gypi           text
 *.ninja          text
