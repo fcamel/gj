@@ -136,6 +136,8 @@ def _find_matches(pattern):
     lines = _gid(pattern)
     # gid may get unmatched pattern when the argument is a number.
     # Don't know the reason. Manually filter unmatched lines.
+    # This fix also supports searching "pattern()" or "pattern("
+    # which is useful to find all function calls.
     candidated_lines = []
     for line in lines:
         tokens = line.split(':', 2)
@@ -414,6 +416,12 @@ def _execute(args):
     return text.split('\n')
 
 def _gid(pattern):
+    # Support searching "FUNCTION(" or "FUNCTION()".
+    # () has special meaning for gid. Do not pass it to gid.
+    if pattern.endswith('('):
+        pattern = pattern[:-1]
+    elif pattern.endswith('()'):
+        pattern = pattern[:-2]
     cmd = [_get_gid_cmd(), pattern]
     return _execute(cmd)
 

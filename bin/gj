@@ -21,6 +21,12 @@ __author__ = 'fcamel'
 #------------------------------------------------------------------------------
 def _gen_vim_command(matches, patterns):
     p = patterns[0]
+    # Support searching "FUNCTION(" or "FUNCTION()".
+    # Passing "()" to vim results in syntax error. Filter out them.
+    if p.endswith('('):
+        p = p[:-1]
+    elif p.endswith('()'):
+        p = p[:-2]
     if len(matches) == 1:
         m = matches[0]
         return 'vim "%s" -c/%s +%s' % (m.filename, p, m.line_num)
