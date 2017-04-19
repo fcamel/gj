@@ -238,7 +238,7 @@ def choose_matches_interactively(matches, patterns, last_n, verbose):
 
     return numbers, matches, patterns
 
-def find_declaration_or_definition(pattern):
+def find_declaration_or_definition(pattern, path_prefix=''):
     if pattern.startswith('m_') or pattern.startswith('s_'):
         # For non-static member fields or static member fields,
         # find symobls in header files.
@@ -246,6 +246,10 @@ def find_declaration_or_definition(pattern):
         return _filter_filename(matches, '\.h$', False)
 
     matches = tuple(find_matches([pattern]))
+
+    if path_prefix:
+        matches = _filter_filename(matches, '^' + path_prefix, False)
+
     # Find declaration if possible.
     result = set()
     types = (

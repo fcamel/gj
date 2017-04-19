@@ -193,7 +193,7 @@ def main():
     # Find the initial matched set.
     gj_util.find_matches.original_patterns = patterns
     if options.decdef:
-        matches = gj_util.find_declaration_or_definition(patterns[0])
+        matches = gj_util.find_declaration_or_definition(patterns[0], path_prefix=options.path)
     elif options.definition:
         matches = gj_util.find_definition(patterns[0])
     else:
