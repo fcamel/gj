@@ -185,7 +185,7 @@ def main():
 
     # Find matched symbols
     if options.symbol:
-        lines = gj_util.find_symbols(patterns[0], verbose=options.verbose)
+        lines = gj_util.find_symbols(patterns[0], verbose=options.verbose, path_pattern=options.path)
         for line in lines:
             print(line.encode('utf8'))
         return 0
