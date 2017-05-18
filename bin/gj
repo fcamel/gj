@@ -202,6 +202,8 @@ def main():
     # Run in batch mode?
     if options.batch:
         for m in matches:
+            if not options.verbose and len(m.text) > gj_util.DEFAULT_CODE_LENGTH:
+                m.text = m.text[:gj_util.DEFAULT_CODE_LENGTH] + " ..."
             print(unicode(m).encode('utf8'))
         return 0
 
