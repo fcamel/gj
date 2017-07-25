@@ -538,6 +538,8 @@ def _filter_matches(matches, pattern):
         # Special case: find the assignment operation and exclude equality operators.
         if new_pattern == '=':
             matched = not not re.search('[^=]=[^=]', m.text)
+            if not matched:
+                matched = not not re.search('[^=]=$', m.text)
         else:
             matched = not not re.search('\\b%s\\b' % new_pattern, m.text)
         if pattern.startswith(negative_symbol):
