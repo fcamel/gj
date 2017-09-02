@@ -171,6 +171,23 @@ def _update_index(binary, path_substituion, mapping):
 
         mapping[symbol].add(info)
 
+def _find_shared_libraries(binary, shared_lib_sub_path):
+    if not shared_lib_sub_path:
+        return []
+
+    result = []
+    proc = subprocess.Popen(['ldd', binary], stdout=subprocess.PIPE)
+    lines = proc.stdout.read().split('\n')
+    for line in lines:
+        # Example: "libcc.so => /path/to/libcc.so (0x00007fa842a83000)"
+        if ' => ' not in line:
+            continue
+
+        shared_lib_path = line.strip().split()[2]
+        if shared_lib_sub_path in shared_lib_path:
+            result.append(shared_lib_path)
+    return result
+
 def _save(mapping, filename):
     infos = []
     for symbol in mapping:
@@ -214,9 +231,13 @@ def _save(mapping, filename):
 
 def index_elf_binaries(binaries, substitution):
     mapping = {}
-    for binary in binaries:
-        print('Index %s ...' % binary)
+    for binary, shared_lib_sub_path in binaries:
+        print('Index [%s] ...' % binary)
         _update_index(binary, substitution, mapping)
+        for shared_lib in _find_shared_libraries(binary, shared_lib_sub_path):
+            print('> Index shared library [%s] ...' % shared_lib)
+            _update_index(shared_lib, substitution, mapping)
+
 
     if DEBUG:
         print('-' * 80)

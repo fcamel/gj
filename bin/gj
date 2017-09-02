@@ -130,9 +130,14 @@ def main():
         with open(gj_util.CONFIG_FILE, 'w') as fw:
             example = [
                 'config = {',
-                '    "binaries": [  # Each line is an ELF binary to be indexed.',
+                '    # Each line is an ELF binary to be indexed.',
+                '    # Example: ("out/debug/myprog", "out/debug")',
+                '    #   Index out/debug/myprog. Also index its dynamic libraries with subpath "out/debug".',
+                '    #   Index no extra dynamic libraries if the second argument is empty.',
+                '    "binaries": [',
                 '    ],',
-                '    "path_substitution": "",  # FROM=TO. E.g., "../../=" removes the prefix "../../".',
+                '    # FROM=TO. E.g., "../../=" removes the prefix "../../".',
+                '    "path_substitution": "",',
                 '}',
                 '',
             ]
