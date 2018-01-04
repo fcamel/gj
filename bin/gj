@@ -131,9 +131,11 @@ def main():
             example = [
                 'config = {',
                 '    # Each line is an ELF binary to be indexed.',
-                '    # Example: ("out/debug/myprog", "out/debug")',
-                '    #   Index out/debug/myprog. Also index its dynamic libraries with subpath "out/debug".',
-                '    #   Index no extra dynamic libraries if the second argument is empty.',
+                '    # Example:',
+                '    #   ("out/debug/myprog", "out/debug")',
+                '    #',
+                '    #   Index out/debug/myprog and dynamic libraries used by myprog with sub-path "out/debug".',
+                '    #   Index no extra dynamic libraries if the second argument is an empty string.',
                 '    "binaries": [',
                 '    ],',
                 '    # FROM=TO. E.g., "../../=" removes the prefix "../../".',
@@ -175,6 +177,7 @@ def main():
                     gj_index.index_elf_binaries(binaries, path_substitution)
             except Exception as e:
                 print('Failed to index ELF: %s: %s' % (type(e).__name__, e.message))
+
         print('\n> Done')
         return 0 if result else 1
 

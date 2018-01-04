@@ -230,6 +230,14 @@ def _save(mapping, filename):
         shutil.rmtree(dirpath)
 
 def index_elf_binaries(binaries, substitution):
+    for value in binaries:
+        print value, len(value)
+        if len(value) != 2:
+            print('Format error: expect each value in "binaries"'
+                  ' is like ("out/debug/myprog", "out/debug")'
+                  ' or ("out/debug/myprog", "")')
+            return False
+
     mapping = {}
     for binary, shared_lib_sub_path in binaries:
         print('Index [%s] ...' % binary)
@@ -252,6 +260,8 @@ def index_elf_binaries(binaries, substitution):
     _save(mapping, gj_util.DEFINITION_INDEX_FILE)
 
     print('Save the index to %s' % gj_util.DEFINITION_INDEX_FILE)
+
+    return True
 
 def main():
     '''\
