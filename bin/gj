@@ -39,6 +39,10 @@ def _gen_general_editor_command(matches, patterns):
     editor = os.environ['EDITOR']
     return '%s %s' % (editor, m.filename)
 
+def _gen_subl_command(matches, patterns):
+    m = matches[0]
+    return 'subl %s:%d' % (m.filename, m.line_num)
+
 # Use vim by default.
 _gen_edit_command = _gen_vim_command
 
@@ -50,7 +54,10 @@ if 'EDITOR'in os.environ:
     # For a general editor, don't know how to jump to the line and highglight
     # the pattern. Only open the file.
     if editor != 'vi' and editor != 'vim':
-        _gen_edit_command = _gen_general_editor_command
+        if editor == 'subl':
+            _gen_edit_command = _gen_subl_command
+        else:
+            _gen_edit_command = _gen_general_editor_command
 
 #------------------------------------------------------------------------------
 # helper methods
