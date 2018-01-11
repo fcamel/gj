@@ -43,6 +43,10 @@ def _gen_subl_command(matches, patterns):
     m = matches[0]
     return 'subl %s:%d' % (m.filename, m.line_num)
 
+def _gen_code_command(matches, patterns):
+    m = matches[0]
+    return 'code -g %s:%d' % (m.filename, m.line_num)
+
 # Use vim by default.
 _gen_edit_command = _gen_vim_command
 
@@ -56,6 +60,8 @@ if 'EDITOR'in os.environ:
     if editor != 'vi' and editor != 'vim':
         if editor == 'subl':
             _gen_edit_command = _gen_subl_command
+        elif editor == 'code':
+            _gen_edit_command = _gen_code_command
         else:
             _gen_edit_command = _gen_general_editor_command
 
