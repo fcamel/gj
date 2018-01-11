@@ -47,23 +47,25 @@ def _gen_code_command(matches, patterns):
     m = matches[0]
     return 'code -g %s:%d' % (m.filename, m.line_num)
 
+# Add your _gen_*_command if you use some other editor.
+_gen_edit_commands = {
+    'vi': _gen_vim_command,
+    'vim': _gen_vim_command,
+    'subl': _gen_subl_command,
+    'code': _gen_code_command,
+}
+
 # Use vim by default.
 _gen_edit_command = _gen_vim_command
 
-if 'EDITOR'in os.environ:
+if 'EDITOR' in os.environ:
     editor = os.environ['EDITOR']
-    # Add your _gen_edit_command if you don't use vim.
-    # E.g., emacs
-
-    # For a general editor, don't know how to jump to the line and highglight
-    # the pattern. Only open the file.
-    if editor != 'vi' and editor != 'vim':
-        if editor == 'subl':
-            _gen_edit_command = _gen_subl_command
-        elif editor == 'code':
-            _gen_edit_command = _gen_code_command
-        else:
-            _gen_edit_command = _gen_general_editor_command
+    if editor in _gen_edit_commands:
+        _gen_edit_command = _gen_edit_commands[editor]
+    else:
+        # Don't know how to jump to the line and highglight the pattern.
+        # Only open the file.
+        _gen_edit_command = _gen_general_editor_command
 
 #------------------------------------------------------------------------------
 # helper methods
@@ -240,7 +242,10 @@ def main():
 
         # Edit the chosen one.
         ms = [matches[n - 1] for n in numbers]
-        ret = os.system(_gen_edit_command(ms, patterns))
+        cmd = _gen_edit_command(ms, patterns)
+        ret = os.system(cmd)
+        if ret != 0:
+            print('Failed to execute: %s' % cmd)
 
         if ret != 0:
             return 4
