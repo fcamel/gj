@@ -135,6 +135,11 @@ def main():
     parser.add_option('-p', '--path', dest='path',
                       type='string', default='',
                       help='Search symbols under specific path.')
+    parser.add_option('-e', '--extended', dest='extended',
+                      type=int, default=0,
+                      help=('Used for multiple pattern search. By default all patterns are searched'
+                            ' in the same line. With this flag, use the first pattern to fine target line'
+                            ' and search the rest patterns in the +/- N lines (default: 0).'))
     options, args = parser.parse_args()
 
     if options.config:
@@ -214,6 +219,7 @@ def main():
         return 0
 
     # Find the initial matched set.
+    gj_util.config['search_extended_lines'] = options.extended
     gj_util.find_matches.original_patterns = patterns
     if options.decdef:
         matches = gj_util.find_declaration_or_definition(patterns[0], path_prefix=options.path)

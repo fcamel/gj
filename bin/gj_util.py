@@ -36,6 +36,11 @@ DEFAULT_CODE_LENGTH = 80
 
 DEBUG = False
 
+# TODO(fcamel): simplified codes by using the global config.
+config = {
+    'search_extended_lines': 0,
+}
+
 #-----------------------------------------------------------
 # public
 #-----------------------------------------------------------
@@ -530,18 +535,32 @@ def _filter_statement(all_, exclude):
     return _subtract_list(all_, matches)
 
 def _filter_matches(matches, pattern):
+    global config
+
     negative_symbol = '~'
 
     new_matches = []
     new_pattern = pattern[1:] if pattern.startswith(negative_symbol) else pattern
     for m in matches:
         # Special case: find the assignment operation and exclude equality operators.
-        if new_pattern == '=':
-            matched = not not re.search('[^=]=[^=]', m.text)
-            if not matched:
-                matched = not not re.search('[^=]=$', m.text)
+        if config['search_extended_lines'] > 0:
+            lines = []
+            with open(m.filename) as fr:
+                i = 0
+                for line in fr:
+                    i += 1
+                    if abs(i - m.line_num) > config['search_extended_lines']:
+                        continue
+                    lines.append(line.strip())
+            text = '\n'.join(lines)
         else:
-            matched = not not re.search('\\b%s\\b' % new_pattern, m.text)
+            text = m.text
+        if new_pattern == '=':
+            matched = not not re.search('[^=]=[^=]', text)
+            if not matched:
+                matched = not not re.search('[^=]=$', text)
+        else:
+            matched = not not re.search('\\b%s\\b' % new_pattern, text)
         if pattern.startswith(negative_symbol):
             matched = not matched
         if matched:
