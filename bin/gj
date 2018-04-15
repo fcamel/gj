@@ -211,15 +211,18 @@ def main():
 
     patterns = process_args(args)
 
+    # Set config.
+    gj_util.config['verbose'] = options.verbose
+    gj_util.config['search_extended_lines'] = options.extended
+
     # Find matched symbols
     if options.symbol:
-        lines = gj_util.find_symbols(patterns[0], verbose=options.verbose, path_pattern=options.path)
+        lines = gj_util.find_symbols(patterns[0], path_pattern=options.path)
         for line in lines:
             print(line.encode('utf8'))
         return 0
 
     # Find the initial matched set.
-    gj_util.config['search_extended_lines'] = options.extended
     gj_util.find_matches.original_patterns = patterns
     if options.decdef:
         matches = gj_util.find_declaration_or_definition(patterns[0], path_prefix=options.path)
@@ -240,7 +243,7 @@ def main():
     # Filter the rest or view the selected file.
     n = 0
     while True:
-        numbers, matches, patterns = gj_util.choose_matches_interactively(matches, patterns, n, options.verbose)
+        numbers, matches, patterns = gj_util.choose_matches_interactively(matches, patterns, n)
         if not numbers:
             if n is None:
                 return 1

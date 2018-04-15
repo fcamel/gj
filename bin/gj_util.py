@@ -36,9 +36,9 @@ DEFAULT_CODE_LENGTH = 80
 
 DEBUG = False
 
-# TODO(fcamel): simplified codes by using the global config.
 config = {
     'search_extended_lines': 0,
+    'verbose': False,
 }
 
 #-----------------------------------------------------------
@@ -171,7 +171,7 @@ def find_matches(patterns=None, filter_='', path_prefix=''):
 
 find_matches.original_patterns = []
 
-def choose_matches_interactively(matches, patterns, last_n, verbose):
+def choose_matches_interactively(matches, patterns, last_n):
     matches = matches[:]  # Make a clone.
 
     if not hasattr(choose_matches_interactively, 'fold'):
@@ -184,7 +184,7 @@ def choose_matches_interactively(matches, patterns, last_n, verbose):
             return [], matches, patterns
 
         matches = sorted(set(matches), key=Match.sort_key)
-        _show_list(matches, patterns, last_n, choose_matches_interactively.fold, verbose)
+        _show_list(matches, patterns, last_n, choose_matches_interactively.fold)
         global input
         try:
             input = raw_input
@@ -303,7 +303,10 @@ def find_definition(symbol):
 
     return sorted(result, key=Match.sort_key)
 
-def find_symbols(pattern, verbose=False, path_pattern=''):
+def find_symbols(pattern, path_pattern=''):
+    global config
+
+    verbose = config['verbose']
     if path_pattern:
         verbose = True
 
@@ -485,7 +488,7 @@ def _highlight(pattern, text, level=2):
 
     return ''.join(result)
 
-def _show_list(matches, patterns, last_n, fold, verbose):
+def _show_list(matches, patterns, last_n, fold):
     def yellow(text):
         if sys.stdout.isatty():
             return '\033[1;33m%s\033[0m' % text
@@ -510,6 +513,8 @@ def _show_list(matches, patterns, last_n, fold, verbose):
         else:
             return text
 
+    global config
+
     os.system('clear')
     last_filename = ''
     for i, m in enumerate(matches):
@@ -522,7 +527,7 @@ def _show_list(matches, patterns, last_n, fold, verbose):
             print(black('(%s) %s:%s:%s' % (i, m.line_num, m.filename, m.text)))
         else:
             code = m.text
-            if not verbose and len(code) > DEFAULT_CODE_LENGTH:
+            if not config['verbose'] and len(code) > DEFAULT_CODE_LENGTH:
                 code = code[:DEFAULT_CODE_LENGTH] + " ..."
             for pattern in patterns:
                 code = _highlight(pattern, code)

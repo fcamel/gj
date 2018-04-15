@@ -49,8 +49,8 @@ def main():
     pattern, = args
 
     # Find matched symbols
+    gj_util.config['verbose'] = options.verbose
     lines = gj_util.find_symbols(pattern,
-                                 verbose=options.verbose,
                                  path_pattern=options.path)
     for line in lines:
         print line.encode('utf8')
