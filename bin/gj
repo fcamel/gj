@@ -241,17 +241,13 @@ def main():
 
     # Enter interactive mode.
     # Filter the rest or view the selected file.
-    n = 0
     while True:
-        numbers, matches, patterns = gj_util.choose_matches_interactively(matches, patterns, n)
-        if not numbers:
-            if n is None:
-                return 1
+        selections, matches, patterns = gj_util.choose_matches_interactively(matches, patterns)
+        if not selections:
             return 0
 
         # Edit the chosen one.
-        ms = [matches[n - 1] for n in numbers]
-        cmd = _gen_edit_command(ms, patterns)
+        cmd = _gen_edit_command(selections, patterns)
         ret = os.system(cmd)
         if ret != 0:
             print('Failed to execute: %s' % cmd)

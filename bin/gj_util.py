@@ -171,11 +171,14 @@ def find_matches(patterns=None, filter_='', path_prefix=''):
 
 find_matches.original_patterns = []
 
-def choose_matches_interactively(matches, patterns, last_n):
+def choose_matches_interactively(matches, patterns):
     matches = matches[:]  # Make a clone.
 
     if not hasattr(choose_matches_interactively, 'fold'):
         choose_matches_interactively.fold = False
+
+    if not hasattr(choose_matches_interactively, 'selections'):
+        choose_matches_interactively.selections = []
 
     # Enter the interactive mode.
     while True:
@@ -184,7 +187,10 @@ def choose_matches_interactively(matches, patterns, last_n):
             return [], matches, patterns
 
         matches = sorted(set(matches), key=Match.sort_key)
-        _show_list(matches, patterns, last_n, choose_matches_interactively.fold)
+        index_mapping = _show_list(matches,
+                                   patterns,
+                                   choose_matches_interactively.selections,
+                                   choose_matches_interactively.fold)
         global input
         try:
             input = raw_input
@@ -231,17 +237,22 @@ def choose_matches_interactively(matches, patterns, last_n):
     matches.sort(key=Match.sort_key)
 
     # Parse the selected number
-    numbers = parse_number(response)
-    if not numbers:
+    input_numbers = parse_number(response)
+    if not input_numbers:
         print('Invalid input.')
         return None, matches, patterns
 
-    for n in numbers:
-        if n < 1 or n > len(matches):
+    numbers = []
+    for n in input_numbers:
+        n = index_mapping.get(n, -1)
+        if n < 0 or n >= len(matches):
             print('Invalid input.')
             return None, matches, patterns
+        numbers.append(n)
 
-    return numbers, matches, patterns
+    choose_matches_interactively.selections = numbers
+
+    return [matches[n] for n in numbers], matches, patterns
 
 def find_declaration_or_definition(pattern, path_prefix=''):
     if pattern.startswith('m_') or pattern.startswith('s_'):
@@ -488,7 +499,7 @@ def _highlight(pattern, text, level=2):
 
     return ''.join(result)
 
-def _show_list(matches, patterns, last_n, fold):
+def _show_list(matches, patterns, selections, fold):
     def yellow(text):
         if sys.stdout.isatty():
             return '\033[1;33m%s\033[0m' % text
@@ -517,21 +528,27 @@ def _show_list(matches, patterns, last_n, fold):
 
     os.system('clear')
     last_filename = ''
+    index_mapping = {}
+    user_index = 1
     for i, m in enumerate(matches):
         if fold and m.filename == last_filename:
             continue
 
         last_filename = m.filename
-        i += 1
-        if i == last_n:
-            print(black('(%s) %s:%s:%s' % (i, m.line_num, m.filename, m.text)))
+        if i in selections:
+            print(black('(%s) %s:%s:%s' % (user_index, m.line_num, m.filename, m.text)))
         else:
             code = m.text
             if not config['verbose'] and len(code) > DEFAULT_CODE_LENGTH:
                 code = code[:DEFAULT_CODE_LENGTH] + " ..."
             for pattern in patterns:
                 code = _highlight(pattern, code)
-            print('(%s) %s:%s:%s' % (red(i), yellow(m.line_num), green(m.filename), code))
+            print('(%s) %s:%s:%s' % (red(user_index), yellow(m.line_num), green(m.filename), code))
+
+        index_mapping[user_index] = i
+        user_index += 1
+
+    return index_mapping
 
 def _filter_statement(all_, exclude):
     matches = [m for m in all_ if re.search(';\s*$', m.text)]
