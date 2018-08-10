@@ -409,7 +409,7 @@ def _get_idutils_install_cmd():
 def _get_gid_cmd():
     gid = 'gid'
     if platform.system() == 'Darwin':
-        if not _is_cmd_exists(gid):
+        if _is_cmd_exists('gid32'):
             gid = 'gid32'
     return gid
 
