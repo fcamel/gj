@@ -612,6 +612,9 @@ def _filter_declaration_or_definitions_for_golang(matches, pattern):
         elif re.match('func (\(.+\) )?%s\(.*,$' % pattern, text):
             # arguments too long, end with some argument.
             new_matches.append(m)
+        elif re.match('func \(.+ \*?%s\) [a-zA-Z][a-zA-Z0-9]*\(.*$' % pattern, text):
+            # |pattern|'s methods
+            new_matches.append(m)
         elif text.endswith(pattern + ' struct {'):
             new_matches.append(m)
         elif text.startswith('var ' + pattern) or text.startswith('const ' + pattern):

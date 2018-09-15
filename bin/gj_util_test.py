@@ -84,6 +84,11 @@ class GJUtilTest(unittest.TestCase):
         self.assertEquals(1, len(actual))
         self.assertEquals(expected, str(actual[0]))
 
+        actual = gj_util.find_declaration_or_definition('MyStruct')
+        expected = 'path/to/a.go:123:10: func (t *MyStruct) foo() {'
+        self.assertEquals(1, len(actual))
+        self.assertEquals(expected, str(actual[0]))
+
     def testFindDeclarationOrDefinitionForGoStruct(self):
         self._input = [
             'path/to/a.go:123:  foo struct {',
