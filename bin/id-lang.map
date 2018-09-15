@@ -28,6 +28,9 @@
 *.m              text
 *.mm             text
 
+# Go
+*.go             text
+
 # Other languages
 *.py             text
 *.java           text

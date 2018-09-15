@@ -68,6 +68,9 @@ class Match(object):
     def __str__(self):
         return str(unicode(self))
 
+    def is_golang(self):
+        return self.filename.endswith('.go')
+
 
 # Used by finding definition.
 class FileLine(object):
@@ -283,6 +286,13 @@ def find_declaration_or_definition(pattern, path_prefix=''):
     result.update(_filter_matches(matches, 'using'))
     # Find definition if possible.
     result.update(_keep_possible_definition(matches, pattern))
+
+    # Special handling for Golang.
+    # 1. Remove all matches from the general rules.
+    result = set(r for r in result if not r.is_golang())
+
+    # 2. Apply customized rules.
+    result.update(_filter_declaration_or_definitions_for_golang(matches, pattern))
 
     return sorted(result, key=Match.sort_key)
 
@@ -588,6 +598,21 @@ def _filter_matches(matches, pattern):
         if matched:
             new_matches.append(m)
 
+    return new_matches
+
+def _filter_declaration_or_definitions_for_golang(matches, pattern):
+    new_matches = []
+    for m in matches:
+        if not m.is_golang():
+            continue
+
+        text = m.text.strip()
+        if re.match('func (\(.+\) )?%s.*{(.*})?$' % pattern, text):
+            new_matches.append(m)
+        elif text.endswith(pattern + ' struct {'):
+            new_matches.append(m)
+        elif text.startswith('var ' + pattern) or text.startswith('const ' + pattern):
+            new_matches.append(m)
     return new_matches
 
 def _filter_filename(all_, pattern, exclude):

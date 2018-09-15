@@ -54,6 +54,51 @@ class GJUtilTest(unittest.TestCase):
         self.assertEquals(1, len(actual))
         self.assertEquals(expected, str(actual[0]))
 
+    def testFindDeclarationOrDefinitionForGoFunction(self):
+        self._input = [
+            'path/to/a.go:456: foo();',
+            'path/to/a.go:123: func foo() {',
+            'path/to/a.go:123: func bar(foo int) {',
+            'path/to/b.go:123: func foo() {/**/}',
+        ]
+
+        actual = gj_util.find_declaration_or_definition('foo')
+        self.assertEquals(2, len(actual))
+        expected = 'path/to/a.go:123:6: func foo() {'
+        self.assertEquals(expected, str(actual[0]))
+        expected = 'path/to/b.go:123:6: func foo() {/**/}'
+        self.assertEquals(expected, str(actual[1]))
+
+    def testFindDeclarationOrDefinitionForGoMethod(self):
+        self._input = [
+            'path/to/a.go:456: foo();',
+            'path/to/a.go:123: func (t *MyStruct) foo() {',
+            'path/to/a.go:123: func bar(foo int) {',
+        ]
+
+        actual = gj_util.find_declaration_or_definition('foo')
+        expected = 'path/to/a.go:123:20: func (t *MyStruct) foo() {'
+        self.assertEquals(1, len(actual))
+        self.assertEquals(expected, str(actual[0]))
+
+    def testFindDeclarationOrDefinitionForGoStruct(self):
+        self._input = [
+            'path/to/a.go:123:  foo struct {',
+            'path/to/a.go:456:  var f foo',
+            'path/to/a.go:789:  f = new(foo)',
+        ]
+
+        actual = gj_util.find_declaration_or_definition('foo')
+        self.assertEquals(1, len(actual))
+        expected = 'path/to/a.go:123:2:  foo struct {'
+        self.assertEquals(expected, str(actual[0]))
+
+
+        actual = gj_util.find_declaration_or_definition('f')
+        self.assertEquals(1, len(actual))
+        expected = 'path/to/a.go:456:6:  var f foo'
+        self.assertEquals(expected, str(actual[0]))
+
 
 if __name__ == '__main__':
     unittest.main()
