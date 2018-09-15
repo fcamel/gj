@@ -60,14 +60,17 @@ class GJUtilTest(unittest.TestCase):
             'path/to/a.go:123: func foo() {',
             'path/to/a.go:123: func bar(foo int) {',
             'path/to/b.go:123: func foo() {/**/}',
+            'path/to/c.go:123: func foo(a int,',
         ]
 
         actual = gj_util.find_declaration_or_definition('foo')
-        self.assertEquals(2, len(actual))
+        self.assertEquals(3, len(actual))
         expected = 'path/to/a.go:123:6: func foo() {'
         self.assertEquals(expected, str(actual[0]))
         expected = 'path/to/b.go:123:6: func foo() {/**/}'
         self.assertEquals(expected, str(actual[1]))
+        expected = 'path/to/c.go:123:6: func foo(a int,'
+        self.assertEquals(expected, str(actual[2]))
 
     def testFindDeclarationOrDefinitionForGoMethod(self):
         self._input = [
