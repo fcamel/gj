@@ -622,6 +622,8 @@ def _filter_declaration_or_definitions_for_golang(matches, pattern):
             new_matches.append(m)
         elif text.endswith(pattern + ' struct {'):
             new_matches.append(m)
+        elif text.endswith(pattern + ' interface {'):
+            new_matches.append(m)
         elif text.startswith('var ' + pattern) or text.startswith('const ' + pattern):
             new_matches.append(m)
     return new_matches
