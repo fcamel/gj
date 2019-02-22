@@ -12,7 +12,24 @@ if (exists('g:loaded_gj_vim') && g:loaded_gj_vim)
 endif
 let g:loaded_gj_vim = 1
 
-let g:gjprg = expand("<sfile>:p:h") . "/../bin/gj_without_interaction"
+let g:gjprg = get(g:, "gj#gj_path", expand("<sfile>:p:h") . "/../bin/gj_without_interaction")
+let g:gj_db_name = get(g:, "gj#db_name", "ID")
+
+function! s:FindDbPath(db_name) abort
+  let curr_dir = expand("%:p:h")
+  if !filereadable(expand("%:p"))
+      let curr_dir = expand("%:p")
+  endif
+  let db_path = curr_dir . "/" . a:db_name
+  while curr_dir != "/"
+    let db_path = curr_dir . "/" . a:db_name
+    if filereadable(db_path)
+        return db_path
+    endif
+    let curr_dir = fnamemodify(curr_dir, ":h")
+  endwhile
+  return a:db_name
+endfunction
 
 function! s:Gj(cmd, args)
   redraw
@@ -24,7 +41,8 @@ function! s:Gj(cmd, args)
   try
     let &grepprg=g:gjprg
     let &grepformat="%f:%l:%c:%m"
-    silent execute a:cmd . " " . escape(l:grepargs, '|')
+    let db_path = s:FindDbPath(g:gj_db_name)
+    silent execute a:cmd . " --db " . escape(db_path, '|') . " " . escape(l:grepargs, '|')
   finally
     let &grepprg=grepprg_bak
     let &grepformat=grepformat_bak
