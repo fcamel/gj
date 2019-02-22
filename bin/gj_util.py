@@ -39,6 +39,7 @@ DEBUG = False
 config = {
     'search_extended_lines': 0,
     'verbose': False,
+    'db_path': 'ID',
 }
 
 #-----------------------------------------------------------
@@ -135,9 +136,9 @@ def check_install():
             print(msg)
             sys.exit(1)
 
-def build_index():
-    path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
-    return _mkid(path)
+def build_index(db_path):
+    lang_path = os.path.join(os.path.dirname(__file__), LANG_MAP_FILE)
+    return _mkid(lang_path, db_path)
 
 
 def _find_matches(pattern):
@@ -385,8 +386,8 @@ def find_symbols(pattern, path_pattern=''):
 #-----------------------------------------------------------
 # private
 #-----------------------------------------------------------
-def _mkid(lang_file):
-    cmd = ['mkid', '-m', lang_file]
+def _mkid(lang_file, db_path):
+    cmd = ['mkid', '-m', lang_file, '-f', db_path]
     process = subprocess.Popen(cmd,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
@@ -449,17 +450,21 @@ def _execute(args):
     return text.split('\n')
 
 def _gid(pattern):
+    global config
+
     # Support searching "FUNCTION(" or "FUNCTION()".
     # () has special meaning for gid. Do not pass it to gid.
     if pattern.endswith('('):
         pattern = pattern[:-1]
     elif pattern.endswith('()'):
         pattern = pattern[:-2]
-    cmd = [_get_gid_cmd(), pattern]
+    cmd = [_get_gid_cmd(), '-f', config['db_path'], pattern]
     return _execute(cmd)
 
 def _lid(pattern, args):
-    cmd = ['lid'] + args + [pattern]
+    global config
+
+    cmd = ['lid', '-f', config['db_path']] + args + [pattern]
     return _execute(cmd)
 
 def _highlight(pattern, text, level=2):

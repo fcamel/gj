@@ -140,6 +140,9 @@ def main():
                       help=('Used for multiple pattern search. By default all patterns are searched'
                             ' in the same line. With this flag, use the first pattern to fine target line'
                             ' and search the rest patterns in the +/- N lines (default: 0).'))
+    parser.add_option('--db', dest='db_path',
+                      type='string', default='ID',
+                      help='Specify text index database path')
     options, args = parser.parse_args()
 
     if options.config:
@@ -174,7 +177,7 @@ def main():
         if index_source:
             print('> Index source codes ...')
             print('')
-            result = gj_util.build_index()
+            result = gj_util.build_index(options.db_path)
 
         filename = gj_util.CONFIG_FILE
         if os.path.exists(filename):
@@ -205,8 +208,8 @@ def main():
         parser.print_help()
         return 2
 
-    if not options.definition and not os.path.exists('ID'):
-        print('Database file "ID" is not found. Have you run "gj -i"?')
+    if not options.definition and not os.path.exists(options.db_path):
+        print('Database file "%s" is not found. Have you run "gj -i"?' % options.db_path)
         return 3
 
     patterns = process_args(args)
@@ -214,6 +217,7 @@ def main():
     # Set config.
     gj_util.config['verbose'] = options.verbose
     gj_util.config['search_extended_lines'] = options.extended
+    gj_util.config['db_path'] = options.db_path
 
     # Find matched symbols
     if options.symbol:

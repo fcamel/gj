@@ -36,20 +36,24 @@ def main():
     parser.add_option('-p', '--path', dest='path',
                       type='string', default='',
                       help='Search symbols under specific path. This also applies --verbose')
+    parser.add_option('--db', dest='db_path',
+                      type='string', default='ID',
+                      help='Specify text index database path')
     options, args = parser.parse_args()
 
     if len(args) != 1:
         parser.print_help()
         return 2
 
-    if not os.path.exists('ID'):
-        print 'Database file "ID" is not found. Have you run "gj -i"?'
+    if not os.path.exists(options.db_path):
+        print('Database file "%s" is not found. Have you run "gj -i"?' % options.db_path)
         return 3
 
     pattern, = args
 
     # Find matched symbols
     gj_util.config['verbose'] = options.verbose
+    gj_util.config['db_path'] = options.db_path
     lines = gj_util.find_symbols(pattern,
                                  path_pattern=options.path)
     for line in lines:
