@@ -470,13 +470,13 @@ def _lid(pattern, args):
 def _highlight(pattern, text, level=2):
     def red(text):
         if sys.stdout.isatty():
-            return '\033[1;31m%s\033[0m' % text
+            return '\033[1;31m%s\033[m' % text
         else:
             return text
 
     def green(text):
         if sys.stdout.isatty():
-            return '\033[1;32m%s\033[0m' % text
+            return '\033[1;32m%s\033[m' % text
         else:
             return text
 
@@ -517,25 +517,25 @@ def _highlight(pattern, text, level=2):
 def _show_list(matches, patterns, selections, fold):
     def yellow(text):
         if sys.stdout.isatty():
-            return '\033[1;33m%s\033[0m' % text
+            return '\033[1;33m%s\033[m' % text
         else:
             return text
 
     def green(text):
         if sys.stdout.isatty():
-            return '\033[1;32m%s\033[0m' % text
+            return '\033[1;32m%s\033[m' % text
         else:
             return text
 
     def red(text):
         if sys.stdout.isatty():
-            return '\033[1;31m%s\033[0m' % text
+            return '\033[1;31m%s\033[m' % text
         else:
             return text
 
     def black(text):
         if sys.stdout.isatty():
-            return '\033[1;30m%s\033[0m' % text
+            return '\033[1;30m%s\033[m' % text
         else:
             return text
 
