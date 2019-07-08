@@ -62,12 +62,9 @@ class Match(object):
     def sort_key(match):
         return (match.filename, match.line_num)
 
-    def __unicode__(self):
-        tokens = [self.filename, self.line_num, self.column, self.text]
-        return u':'.join(map(unicode, tokens))
-
     def __str__(self):
-        return str(unicode(self))
+        tokens = [self.filename, self.line_num, self.column, self.text]
+        return ':'.join(map(str, tokens))
 
     def is_golang(self):
         return self.filename.endswith('.go')

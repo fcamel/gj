@@ -231,7 +231,7 @@ def _save(mapping, filename):
 
 def index_elf_binaries(binaries, substitution):
     for value in binaries:
-        print value, len(value)
+        print(value, len(value))
         if len(value) != 2:
             print('Format error: expect each value in "binaries"'
                   ' is like ("out/debug/myprog", "out/debug")'

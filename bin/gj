@@ -223,7 +223,7 @@ def main():
     if options.symbol:
         lines = gj_util.find_symbols(patterns[0], path_pattern=options.path)
         for line in lines:
-            print(line.encode('utf8'))
+            print(line)
         return 0
 
     # Find the initial matched set.
@@ -240,7 +240,7 @@ def main():
         for m in matches:
             if not options.verbose and len(m.text) > gj_util.DEFAULT_CODE_LENGTH:
                 m.text = m.text[:gj_util.DEFAULT_CODE_LENGTH] + " ..."
-            print(unicode(m).encode('utf8'))
+            print(m)
         return 0
 
     # Enter interactive mode.
