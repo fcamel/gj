@@ -57,3 +57,4 @@
 *.ipdl           text
 *.in             text
 *.proto          text
+*.yaml           text
