@@ -114,6 +114,9 @@ def main():
                             'Useful to help filter common name such as "Start". '
                             'For example, "Start -f MySuperThread" will find out files which '
                             'contain MySuperThread and Start simultaneously.')
+    parser.add_option('-a', '--assignment', dest='assignment',
+                      action='store_true', default=False,
+                      help='Find where the first pattern is assigned (experimental feature for Go)')
     parser.add_option('-b', '--batch', dest='batch',
                       action='store_true', default=False,
                       help='Run in batch mode (i.e., no interaction).')
@@ -232,6 +235,8 @@ def main():
         matches = gj_util.find_declaration_or_definition(patterns[0], path_prefix=options.path)
     elif options.definition:
         matches = gj_util.find_definition(patterns[0])
+    elif options.assignment:
+        matches = gj_util.find_assignment(patterns[0], path_prefix=options.path)
     else:
         matches = gj_util.find_matches(path_prefix=options.path, filter_=options.filter_)
 

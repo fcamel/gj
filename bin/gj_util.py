@@ -322,6 +322,16 @@ def find_definition(symbol):
 
     return sorted(result, key=Match.sort_key)
 
+# Experimental feature for Go.
+def find_assignment(symbol, path_prefix=''):
+    matches = tuple(find_matches([symbol]))
+
+    if path_prefix:
+        matches = _filter_filename(matches, '^' + path_prefix, False)
+
+    # Find Go assignments. Assume the code is well-formatted.
+    return sorted(_filter_assignment(matches, symbol), key=Match.sort_key)
+
 def find_symbols(pattern, path_pattern=''):
     global config
 
@@ -567,6 +577,18 @@ def _filter_statement(all_, exclude):
     if not exclude:
         return matches
     return _subtract_list(all_, matches)
+
+def _filter_assignment(all_, symbol):
+    patterns = [
+        '%s = ' % symbol,        # normal case.
+        '%s := ' % symbol,       # declaration.
+        '%s\[.+\] = ' % symbol,  # map/array/slice.
+        '%s: ' % symbol,         # map's keys/struct's member fields
+    ]
+    result = set()
+    for p in patterns:
+        result.update((m for m in all_ if re.search(p, m.text)))
+    return result
 
 def _filter_matches(matches, pattern):
     global config
