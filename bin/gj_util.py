@@ -444,7 +444,7 @@ def _execute(args):
             print('\ntext: <%s>\nreturns non-utf8 result.' % text)
             print('-' * 80)
         result = []
-        for line in text.split('\n'):
+        for line in text.split(b'\n'):
             try:
                 line = line.decode('utf8')
                 result.append(line)
