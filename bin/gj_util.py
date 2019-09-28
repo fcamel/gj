@@ -615,6 +615,10 @@ def _filter_matches(matches, pattern):
             matched = not not re.search('[^=]=[^=]', text)
             if not matched:
                 matched = not not re.search('[^=]=$', text)
+        elif new_pattern == '{':
+            # NOTE: Special handling for Go.
+            # Searching "Type {" can help finding the initialization of Type.
+            matched = not not re.search('%s' % new_pattern, text)
         else:
             matched = not not re.search('\\b%s\\b' % new_pattern, text)
         if pattern.startswith(negative_symbol):
